@@ -1,67 +1,141 @@
 ﻿#include <iostream>
-#include <mysql.h>
-#include <string>
+#include <windows.h>
+#include "Database.h"
+#include "Registration.h"
+#include "Login.h"
+#include "AdminModule.h"
+#include "StaffModule.h"
 
 using namespace std;
 
-// Global variables (These should ideally be handled within a class for better design)
-MYSQL* conn;
-// MYSQL_ROW row;  // Unused here, but kept for context
-// MYSQL_RES* res; // Must be a pointer if declared globally for result set
+void displayMainMenu() {
+    system("cls");
+    cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+    cout << "║                                                                ║" << endl;
+    cout << "║              HOSPITAL MANAGEMENT SYSTEM                        ║" << endl;
+    cout << "║                                                                ║" << endl;
+    cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    cout << "\n╔════════════════════════════════════════╗" << endl;
+    cout << "║  1. Registration                        ║" << endl;
+    cout << "║  2. Login                              ║" << endl;
+    cout << "║  0. Exit                               ║" << endl;
+    cout << "╚════════════════════════════════════════╝" << endl;
+}
 
-class db_response
-{
-public:
-    static void ConnectionFunction()
-    {
-        // 1. Initialize the MYSQL handle
-        conn = mysql_init(0);
-
-        if (!conn) {
-            cerr << "MYSQL Initialization failed: " << mysql_error(conn) << endl;
-            return; // Exit if initialization fails
-        }
-
-        // 2. Attempt the real connection
-        // Parameters: (handle, host, user, password, database, port, unix_socket, client_flags)
-        conn = mysql_real_connect(conn, "localhost", "root", "",
-            "hospital_managemant_system", 3306, NULL, 0);
-
-        if (conn)
-        {
-            cout << "✅ Successfully Connected to Database: hospital_managemant_system" << endl;
-            // Optionally set character set here: mysql_set_character_set(conn, "utf8");
-        }
-        else
-        {
-            // CRITICAL: Print the specific error message for debugging!
-            cerr << "❌ Failed To Connect to MySQL!" << endl;
-            cerr << "Error: " << mysql_error(conn) << endl;
-            // You may want to call mysql_close(conn) here if the connection failed, 
-            // though the handle might be invalid if initialization was the failure point.
-        }
-    }
-
-    // IMPORTANT: Add a function to close the connection when done!
-    static void CloseConnection()
-    {
-        if (conn) {
-            mysql_close(conn);
-            cout << "Database connection closed." << endl;
-            conn = nullptr; // Set to nullptr to avoid dangling pointer issues
-        }
-    }
-};
-
-// Example usage in main (requires you to handle getch/conio.h outside)
 int main() {
-    db_response::ConnectionFunction();
-    // ... Your application logic (CRUD operations) ...
-    db_response::CloseConnection();
+    // Set console to support UTF-8 characters
+    SetConsoleOutputCP(65001);
+    
+    Database db;
+    
+    if (!db.connect()) {
+        cout << "\n❌ Failed to connect to database!" << endl;
+        cout << "Please ensure:" << endl;
+        cout << "1. XAMPP MySQL is running" << endl;
+        cout << "2. Database 'hospital_management_system' exists" << endl;
+        cout << "3. Run database_schema.sql to create tables" << endl;
+        cout << "\nPress Enter to exit...";
+        cin.get();
+        return 1;
+    }
 
-    // getch() is part of conio.h and non-standard. Use cin.get() instead if possible.
-    // cout << "Press any key to exit...";
-    // cin.get(); 
+    Registration registration(&db);
+    Login login(&db);
+    AdminModule adminModule(&db);
+    StaffModule* staffModule = nullptr;
 
+    int mainChoice;
+    bool loggedIn = false;
+
+    do {
+        if (!loggedIn) {
+            displayMainMenu();
+            cout << "\nEnter your choice: ";
+            cin >> mainChoice;
+            cin.ignore();
+
+            switch (mainChoice) {
+            case 1:
+                registration.showMenu();
+                break;
+            case 2:
+                login.showLoginMenu();
+                if (login.getCurrentUserId() > 0) {
+                    loggedIn = true;
+                }
+                break;
+            case 0:
+                cout << "\nThank you for using Hospital Management System!" << endl;
+                break;
+            default:
+                cout << "\n❌ Invalid choice! Please try again." << endl;
+                cout << "Press Enter to continue...";
+                cin.get();
+            }
+        } else {
+            // User is logged in - show appropriate menu
+            string userType = login.getCurrentUserType();
+            
+            if (userType == "admin") {
+                system("cls");
+                cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+                cout << "║                    ADMIN DASHBOARD                            ║" << endl;
+                cout << "║                    Welcome, " << setw(30) << left << login.getCurrentUsername() << "║" << endl;
+                cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+                adminModule.showMenu();
+                
+                // After admin module returns, ask if they want to logout
+                cout << "\nDo you want to logout? (yes/no): ";
+                string logoutChoice;
+                getline(cin, logoutChoice);
+                if (logoutChoice == "yes" || logoutChoice == "YES") {
+                    login.logout();
+                    loggedIn = false;
+                }
+            } else if (userType == "staff") {
+                if (!staffModule) {
+                    staffModule = new StaffModule(&db, login.getCurrentUserId());
+                }
+                
+                system("cls");
+                cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+                cout << "║                    STAFF DASHBOARD                            ║" << endl;
+                cout << "║                    Welcome, " << setw(30) << left << login.getCurrentUsername() << "║" << endl;
+                cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+                staffModule->showMenu();
+                
+                // After staff module returns, ask if they want to logout
+                cout << "\nDo you want to logout? (yes/no): ";
+                string logoutChoice;
+                getline(cin, logoutChoice);
+                if (logoutChoice == "yes" || logoutChoice == "YES") {
+                    login.logout();
+                    loggedIn = false;
+                    delete staffModule;
+                    staffModule = nullptr;
+                }
+            } else if (userType == "patient") {
+                system("cls");
+                cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+                cout << "║                    PATIENT DASHBOARD                           ║" << endl;
+                cout << "║                    Welcome, " << setw(30) << left << login.getCurrentUsername() << "║" << endl;
+                cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+                cout << "\nPatient module features coming soon!" << endl;
+                cout << "\nDo you want to logout? (yes/no): ";
+                string logoutChoice;
+                getline(cin, logoutChoice);
+                if (logoutChoice == "yes" || logoutChoice == "YES") {
+                    login.logout();
+                    loggedIn = false;
+                }
+            }
+        }
+    } while (mainChoice != 0);
+
+    if (staffModule) {
+        delete staffModule;
+    }
+
+    db.disconnect();
     return 0;
 }
