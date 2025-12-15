@@ -1,22 +1,33 @@
-#include "../include/Login.h"
+#include "Login.h"
 
-Login::Login(Database* database) : db(database), currentUserId(-1), currentUserType(""), currentUsername("") {}
+Login::Login(Database* database) : db(database), currentUserId(-1), currentUserType(""), currentUsername(""), currentRole("") {}
 
-bool Login::authenticate(const string& username, const string& password, const string& userType) {
+bool Login::authenticate(const string& username, const string& password) {
     try {
-        string table = userType;
-        string idField = userType + "_id";
-        string query = "SELECT " + idField + ", username, full_name FROM " + table + 
-                      " WHERE username = '" + username + "' AND password = '" + password + "'";
+        // Query the login table which has username, password, and role
+        string query = "SELECT login_id, username, role, doctor_id, nurse_id, admin_id FROM login "
+                      "WHERE username = '" + username + "' AND password = '" + password + "'";
         
         sql::ResultSet* res = db->executeSelect(query);
         
         if (res && res->next()) {
-            currentUserId = res->getInt(idField);
             currentUsername = res->getString("username");
-            currentUserType = userType;
+            currentRole = res->getString("role");
+            
+            // Determine user type and ID based on role
+            if (currentRole == "Doctor") {
+                currentUserType = "doctor";
+                currentUserId = res->getInt("doctor_id");
+            } else if (currentRole == "Nurse") {
+                currentUserType = "nurse";
+                currentUserId = res->getInt("nurse_id");
+            } else if (currentRole == "Admin") {
+                currentUserType = "admin";
+                currentUserId = res->getInt("admin_id");
+            }
+            
             delete res;
-            return true;
+            return currentUserId > 0;
         }
         
         if (res) delete res;
@@ -30,42 +41,9 @@ bool Login::authenticate(const string& username, const string& password, const s
 
 void Login::showLoginMenu() {
     system("cls");
-    displayTableHeader("LOGIN MODULE");
+    displayTableHeader("LOGIN");
     
-    string username, password, userType;
-    int choice;
-
-    cout << "\n╔════════════════════════════════════════╗" << endl;
-    cout << "║  Select User Type:                     ║" << endl;
-    cout << "║  1. Patient                            ║" << endl;
-    cout << "║  2. Staff                              ║" << endl;
-    cout << "║  3. Admin                              ║" << endl;
-    cout << "║  0. Back to Main Menu                  ║" << endl;
-    cout << "╚════════════════════════════════════════╝" << endl;
-    cout << "\nEnter your choice: ";
-    cin >> choice;
-    cin.ignore();
-
-    if (choice == 0) {
-        return;
-    }
-
-    switch (choice) {
-    case 1:
-        userType = "patient";
-        break;
-    case 2:
-        userType = "staff";
-        break;
-    case 3:
-        userType = "admin";
-        break;
-    default:
-        cout << "\n❌ Invalid choice!" << endl;
-        cout << "Press Enter to continue...";
-        cin.get();
-        return;
-    }
+    string username, password;
 
     cout << "\nEnter Username: ";
     getline(cin, username);
@@ -87,8 +65,9 @@ void Login::showLoginMenu() {
         return;
     }
 
-    if (authenticate(username, password, userType)) {
+    if (authenticate(username, password)) {
         cout << "\n✅ Login successful! Welcome, " << currentUsername << "!" << endl;
+        cout << "Role: " << currentRole << endl;
         cout << "Press Enter to continue...";
         cin.get();
     } else {
@@ -110,10 +89,15 @@ string Login::getCurrentUsername() {
     return currentUsername;
 }
 
+string Login::getCurrentRole() {
+    return currentRole;
+}
+
 void Login::logout() {
     currentUserId = -1;
     currentUserType = "";
     currentUsername = "";
+    currentRole = "";
 }
 
 void Login::displayTableHeader(const string& title) {
@@ -124,4 +108,3 @@ void Login::displayTableHeader(const string& title) {
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
 }
-

@@ -1,16 +1,17 @@
-#include "../include/Registration.h"
+#include "Registration.h"
 
 Registration::Registration(Database* database) : db(database) {}
 
-void Registration::showMenu() {
+void Registration::showPreRegistrationMenu() {
     int choice;
     do {
         system("cls");
-        displayTableHeader("REGISTRATION MODULE");
+        displayTableHeader("PRE-REGISTRATION");
         cout << "\n╔════════════════════════════════════════╗" << endl;
-        cout << "║  1. Register Patient                  ║" << endl;
-        cout << "║  2. Register Staff                    ║" << endl;
-        cout << "║  3. Register Admin                    ║" << endl;
+        cout << "║  Select Role:                         ║" << endl;
+        cout << "║  1. Doctor                            ║" << endl;
+        cout << "║  2. Nurse                             ║" << endl;
+        cout << "║  3. Admin                             ║" << endl;
         cout << "║  0. Back to Main Menu                 ║" << endl;
         cout << "╚════════════════════════════════════════╝" << endl;
         cout << "\nEnter your choice: ";
@@ -19,10 +20,10 @@ void Registration::showMenu() {
 
         switch (choice) {
         case 1:
-            registerPatient();
+            registerDoctor();
             break;
         case 2:
-            registerStaff();
+            registerNurse();
             break;
         case 3:
             registerAdmin();
@@ -36,35 +37,14 @@ void Registration::showMenu() {
     } while (choice != 0);
 }
 
-void Registration::registerPatient() {
+void Registration::registerDoctor() {
     system("cls");
-    displayTableHeader("PATIENT REGISTRATION");
+    displayTableHeader("DOCTOR REGISTRATION");
 
-    string username, password, fullName, email, phone, dob, gender, address, emergencyContact, emergencyPhone, bloodType;
+    string fullName, gender, specialization, contactNumber, password1, password2, username;
 
     try {
-        cout << "\nEnter Username: ";
-        getline(cin, username);
-        if (username.empty()) {
-            cout << "\n❌ Username cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-        if (usernameExists(username, "patient")) {
-            cout << "\n❌ Username already exists! Please choose another." << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Password: ";
-        getline(cin, password);
-        if (password.empty()) {
-            cout << "\n❌ Password cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Full Name: ";
+        cout << "\nEnter Full Name: ";
         getline(cin, fullName);
         if (fullName.empty()) {
             cout << "\n❌ Full name cannot be empty!" << endl;
@@ -72,76 +52,105 @@ void Registration::registerPatient() {
             return;
         }
 
-        cout << "Enter Email: ";
-        getline(cin, email);
-        if (!validateEmail(email)) {
-            cout << "\n❌ Invalid email format!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-        if (emailExists(email, "patient")) {
-            cout << "\n❌ Email already exists! Please use another." << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Phone: ";
-        getline(cin, phone);
-        if (!validatePhone(phone)) {
-            cout << "\n❌ Invalid phone number!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Date of Birth (YYYY-MM-DD): ";
-        getline(cin, dob);
-
         cout << "Enter Gender (Male/Female/Other): ";
         getline(cin, gender);
-
-        cout << "Enter Address: ";
-        getline(cin, address);
-
-        cout << "Enter Emergency Contact Name: ";
-        getline(cin, emergencyContact);
-
-        cout << "Enter Emergency Contact Phone: ";
-        getline(cin, emergencyPhone);
-
-        cout << "Enter Blood Type (e.g., A+, B-, O+): ";
-        getline(cin, bloodType);
-
-        string query = "INSERT INTO patient (username, password, full_name, email, phone, date_of_birth, gender, address, emergency_contact, emergency_phone, blood_type) "
-            "VALUES ('" + username + "', '" + password + "', '" + fullName + "', '" + email + "', '" + phone + "', ";
-        
-        if (dob.empty()) {
-            query += "NULL, ";
-        } else {
-            query += "'" + dob + "', ";
-        }
-
         if (gender.empty()) {
-            query += "NULL, ";
-        } else {
-            query += "'" + gender + "', ";
+            cout << "\n❌ Gender cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
         }
 
-        query += "'" + address + "', '" + emergencyContact + "', '" + emergencyPhone + "', '" + bloodType + "')";
+        cout << "Enter Specialization: ";
+        getline(cin, specialization);
+        if (specialization.empty()) {
+            cout << "\n❌ Specialization cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        cout << "Enter Contact Number: ";
+        getline(cin, contactNumber);
+        if (contactNumber.empty()) {
+            cout << "\n❌ Contact number cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        cout << "Create Username: ";
+        getline(cin, username);
+        if (username.empty()) {
+            cout << "\n❌ Username cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        // Check if username exists in login table
+        string checkQuery = "SELECT COUNT(*) as count FROM login WHERE username = '" + username + "'";
+        sql::ResultSet* checkRes = db->executeSelect(checkQuery);
+        if (checkRes && checkRes->next() && checkRes->getInt("count") > 0) {
+            cout << "\n❌ Username already exists! Please choose another." << endl;
+            if (checkRes) delete checkRes;
+            pressEnterToContinue();
+            return;
+        }
+        if (checkRes) delete checkRes;
+
+        cout << "Create Password: ";
+        getline(cin, password1);
+        if (password1.empty()) {
+            cout << "\n❌ Password cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        cout << "Re-enter Password: ";
+        getline(cin, password2);
+
+        if (!validatePassword(password1, password2)) {
+            cout << "\n❌ Passwords do not match! Please try again." << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        // Insert into doctor table
+        string query = "INSERT INTO doctor (full_name, gender, specialization, contact_number, availability, status, role) "
+            "VALUES ('" + fullName + "', '" + gender + "', '" + specialization + "', '" + contactNumber + "', 'Available', 'Active', 'Doctor')";
 
         if (db->executeUpdate(query)) {
-            cout << "\n✅ Patient registered successfully!" << endl;
-            
-            // Display registered patient in table format
-            cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
-            cout << "║                    REGISTERED PATIENT DETAILS                  ║" << endl;
-            cout << "╠════════════════════════════════════════════════════════════════╣" << endl;
-            cout << "║ Username: " << left << setw(47) << username << "║" << endl;
-            cout << "║ Full Name: " << left << setw(46) << fullName << "║" << endl;
-            cout << "║ Email: " << left << setw(50) << email << "║" << endl;
-            cout << "║ Phone: " << left << setw(50) << phone << "║" << endl;
-            cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+            // Get the doctor_id that was just inserted
+            string getIdQuery = "SELECT doctor_id FROM doctor WHERE full_name = '" + fullName + "' AND contact_number = '" + contactNumber + "' ORDER BY doctor_id DESC LIMIT 1";
+            sql::ResultSet* idRes = db->executeSelect(getIdQuery);
+            int doctorId = -1;
+            if (idRes && idRes->next()) {
+                doctorId = idRes->getInt("doctor_id");
+            }
+            if (idRes) delete idRes;
+
+            if (doctorId > 0) {
+                // Insert into login table
+                string loginQuery = "INSERT INTO login (username, password, role, doctor_id) "
+                    "VALUES ('" + username + "', '" + password1 + "', 'Doctor', " + to_string(doctorId) + ")";
+
+                if (db->executeUpdate(loginQuery)) {
+                    cout << "\n✅ Doctor registered successfully!" << endl;
+                    
+                    // Display registered doctor in table format
+                    cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+                    cout << "║                    REGISTERED DOCTOR DETAILS                  ║" << endl;
+                    cout << "╠════════════════════════════════════════════════════════════════╣" << endl;
+                    cout << "║ Username: " << left << setw(47) << username << "║" << endl;
+                    cout << "║ Full Name: " << left << setw(46) << fullName << "║" << endl;
+                    cout << "║ Specialization: " << left << setw(41) << specialization << "║" << endl;
+                    cout << "║ Contact Number: " << left << setw(41) << contactNumber << "║" << endl;
+                    cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+                } else {
+                    cout << "\n⚠️  Doctor created but login failed! Please contact admin." << endl;
+                }
+            } else {
+                cout << "\n❌ Failed to retrieve doctor ID!" << endl;
+            }
         } else {
-            cout << "\n❌ Failed to register patient!" << endl;
+            cout << "\n❌ Failed to register doctor!" << endl;
         }
     }
     catch (exception& e) {
@@ -151,35 +160,14 @@ void Registration::registerPatient() {
     pressEnterToContinue();
 }
 
-void Registration::registerStaff() {
+void Registration::registerNurse() {
     system("cls");
-    displayTableHeader("STAFF REGISTRATION");
+    displayTableHeader("NURSE REGISTRATION");
 
-    string username, password, fullName, email, phone, position, department;
+    string fullName, gender, contactNumber, password1, password2, username;
 
     try {
-        cout << "\nEnter Username: ";
-        getline(cin, username);
-        if (username.empty()) {
-            cout << "\n❌ Username cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-        if (usernameExists(username, "staff")) {
-            cout << "\n❌ Username already exists! Please choose another." << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Password: ";
-        getline(cin, password);
-        if (password.empty()) {
-            cout << "\n❌ Password cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Full Name: ";
+        cout << "\nEnter Full Name: ";
         getline(cin, fullName);
         if (fullName.empty()) {
             cout << "\n❌ Full name cannot be empty!" << endl;
@@ -187,56 +175,95 @@ void Registration::registerStaff() {
             return;
         }
 
-        cout << "Enter Email: ";
-        getline(cin, email);
-        if (!validateEmail(email)) {
-            cout << "\n❌ Invalid email format!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-        if (emailExists(email, "staff")) {
-            cout << "\n❌ Email already exists! Please use another." << endl;
+        cout << "Enter Gender (Male/Female/Other): ";
+        getline(cin, gender);
+        if (gender.empty()) {
+            cout << "\n❌ Gender cannot be empty!" << endl;
             pressEnterToContinue();
             return;
         }
 
-        cout << "Enter Phone: ";
-        getline(cin, phone);
-        if (!validatePhone(phone)) {
-            cout << "\n❌ Invalid phone number!" << endl;
+        cout << "Enter Contact Number: ";
+        getline(cin, contactNumber);
+        if (contactNumber.empty()) {
+            cout << "\n❌ Contact number cannot be empty!" << endl;
             pressEnterToContinue();
             return;
         }
 
-        cout << "Enter Position: ";
-        getline(cin, position);
-        if (position.empty()) {
-            cout << "\n❌ Position cannot be empty!" << endl;
+        cout << "Create Username: ";
+        getline(cin, username);
+        if (username.empty()) {
+            cout << "\n❌ Username cannot be empty!" << endl;
             pressEnterToContinue();
             return;
         }
 
-        cout << "Enter Department: ";
-        getline(cin, department);
+        // Check if username exists
+        string checkQuery = "SELECT COUNT(*) as count FROM login WHERE username = '" + username + "'";
+        sql::ResultSet* checkRes = db->executeSelect(checkQuery);
+        if (checkRes && checkRes->next() && checkRes->getInt("count") > 0) {
+            cout << "\n❌ Username already exists! Please choose another." << endl;
+            if (checkRes) delete checkRes;
+            pressEnterToContinue();
+            return;
+        }
+        if (checkRes) delete checkRes;
 
-        string query = "INSERT INTO staff (username, password, full_name, email, phone, position, department) "
-            "VALUES ('" + username + "', '" + password + "', '" + fullName + "', '" + email + "', '" + phone + "', '" + position + "', '" + department + "')";
+        cout << "Create Password: ";
+        getline(cin, password1);
+        if (password1.empty()) {
+            cout << "\n❌ Password cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        cout << "Re-enter Password: ";
+        getline(cin, password2);
+
+        if (!validatePassword(password1, password2)) {
+            cout << "\n❌ Passwords do not match! Please try again." << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        // Insert into nurse table
+        string query = "INSERT INTO nurse (full_name, gender, contact_number, status, role) "
+            "VALUES ('" + fullName + "', '" + gender + "', '" + contactNumber + "', 'Active', 'Nurse')";
 
         if (db->executeUpdate(query)) {
-            cout << "\n✅ Staff registered successfully!" << endl;
-            
-            // Display registered staff in table format
-            cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
-            cout << "║                     REGISTERED STAFF DETAILS                    ║" << endl;
-            cout << "╠════════════════════════════════════════════════════════════════╣" << endl;
-            cout << "║ Username: " << left << setw(47) << username << "║" << endl;
-            cout << "║ Full Name: " << left << setw(46) << fullName << "║" << endl;
-            cout << "║ Email: " << left << setw(50) << email << "║" << endl;
-            cout << "║ Position: " << left << setw(47) << position << "║" << endl;
-            cout << "║ Department: " << left << setw(45) << department << "║" << endl;
-            cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+            // Get the nurse_id
+            string getIdQuery = "SELECT nurse_id FROM nurse WHERE full_name = '" + fullName + "' AND contact_number = '" + contactNumber + "' ORDER BY nurse_id DESC LIMIT 1";
+            sql::ResultSet* idRes = db->executeSelect(getIdQuery);
+            int nurseId = -1;
+            if (idRes && idRes->next()) {
+                nurseId = idRes->getInt("nurse_id");
+            }
+            if (idRes) delete idRes;
+
+            if (nurseId > 0) {
+                // Insert into login table
+                string loginQuery = "INSERT INTO login (username, password, role, nurse_id) "
+                    "VALUES ('" + username + "', '" + password1 + "', 'Nurse', " + to_string(nurseId) + ")";
+
+                if (db->executeUpdate(loginQuery)) {
+                    cout << "\n✅ Nurse registered successfully!" << endl;
+                    
+                    cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+                    cout << "║                    REGISTERED NURSE DETAILS                   ║" << endl;
+                    cout << "╠════════════════════════════════════════════════════════════════╣" << endl;
+                    cout << "║ Username: " << left << setw(47) << username << "║" << endl;
+                    cout << "║ Full Name: " << left << setw(46) << fullName << "║" << endl;
+                    cout << "║ Contact Number: " << left << setw(41) << contactNumber << "║" << endl;
+                    cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+                } else {
+                    cout << "\n⚠️  Nurse created but login failed! Please contact admin." << endl;
+                }
+            } else {
+                cout << "\n❌ Failed to retrieve nurse ID!" << endl;
+            }
         } else {
-            cout << "\n❌ Failed to register staff!" << endl;
+            cout << "\n❌ Failed to register nurse!" << endl;
         }
     }
     catch (exception& e) {
@@ -250,31 +277,10 @@ void Registration::registerAdmin() {
     system("cls");
     displayTableHeader("ADMIN REGISTRATION");
 
-    string username, password, fullName, email, phone;
+    string fullName, email, contactNumber, password1, password2, username;
 
     try {
-        cout << "\nEnter Username: ";
-        getline(cin, username);
-        if (username.empty()) {
-            cout << "\n❌ Username cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-        if (usernameExists(username, "admin")) {
-            cout << "\n❌ Username already exists! Please choose another." << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Password: ";
-        getline(cin, password);
-        if (password.empty()) {
-            cout << "\n❌ Password cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        cout << "Enter Full Name: ";
+        cout << "\nEnter Full Name: ";
         getline(cin, fullName);
         if (fullName.empty()) {
             cout << "\n❌ Full name cannot be empty!" << endl;
@@ -284,39 +290,91 @@ void Registration::registerAdmin() {
 
         cout << "Enter Email: ";
         getline(cin, email);
-        if (!validateEmail(email)) {
+        if (email.empty() || email.find('@') == string::npos) {
             cout << "\n❌ Invalid email format!" << endl;
             pressEnterToContinue();
             return;
         }
-        if (emailExists(email, "admin")) {
-            cout << "\n❌ Email already exists! Please use another." << endl;
+
+        cout << "Enter Contact Number: ";
+        getline(cin, contactNumber);
+        if (contactNumber.empty()) {
+            cout << "\n❌ Contact number cannot be empty!" << endl;
             pressEnterToContinue();
             return;
         }
 
-        cout << "Enter Phone: ";
-        getline(cin, phone);
-        if (!validatePhone(phone)) {
-            cout << "\n❌ Invalid phone number!" << endl;
+        cout << "Create Username: ";
+        getline(cin, username);
+        if (username.empty()) {
+            cout << "\n❌ Username cannot be empty!" << endl;
             pressEnterToContinue();
             return;
         }
 
-        string query = "INSERT INTO admin (username, password, full_name, email, phone) "
-            "VALUES ('" + username + "', '" + password + "', '" + fullName + "', '" + email + "', '" + phone + "')";
+        // Check if username exists
+        string checkQuery = "SELECT COUNT(*) as count FROM login WHERE username = '" + username + "'";
+        sql::ResultSet* checkRes = db->executeSelect(checkQuery);
+        if (checkRes && checkRes->next() && checkRes->getInt("count") > 0) {
+            cout << "\n❌ Username already exists! Please choose another." << endl;
+            if (checkRes) delete checkRes;
+            pressEnterToContinue();
+            return;
+        }
+        if (checkRes) delete checkRes;
+
+        cout << "Create Password: ";
+        getline(cin, password1);
+        if (password1.empty()) {
+            cout << "\n❌ Password cannot be empty!" << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        cout << "Re-enter Password: ";
+        getline(cin, password2);
+
+        if (!validatePassword(password1, password2)) {
+            cout << "\n❌ Passwords do not match! Please try again." << endl;
+            pressEnterToContinue();
+            return;
+        }
+
+        // Insert into admin table
+        string query = "INSERT INTO admin (full_name, email, contact_number, status, role) "
+            "VALUES ('" + fullName + "', '" + email + "', '" + contactNumber + "', 'Active', 'Admin')";
 
         if (db->executeUpdate(query)) {
-            cout << "\n✅ Admin registered successfully!" << endl;
-            
-            // Display registered admin in table format
-            cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
-            cout << "║                    REGISTERED ADMIN DETAILS                     ║" << endl;
-            cout << "╠════════════════════════════════════════════════════════════════╣" << endl;
-            cout << "║ Username: " << left << setw(47) << username << "║" << endl;
-            cout << "║ Full Name: " << left << setw(46) << fullName << "║" << endl;
-            cout << "║ Email: " << left << setw(50) << email << "║" << endl;
-            cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+            // Get the admin_id
+            string getIdQuery = "SELECT admin_id FROM admin WHERE email = '" + email + "' ORDER BY admin_id DESC LIMIT 1";
+            sql::ResultSet* idRes = db->executeSelect(getIdQuery);
+            int adminId = -1;
+            if (idRes && idRes->next()) {
+                adminId = idRes->getInt("admin_id");
+            }
+            if (idRes) delete idRes;
+
+            if (adminId > 0) {
+                // Insert into login table
+                string loginQuery = "INSERT INTO login (username, password, role, admin_id) "
+                    "VALUES ('" + username + "', '" + password1 + "', 'Admin', " + to_string(adminId) + ")";
+
+                if (db->executeUpdate(loginQuery)) {
+                    cout << "\n✅ Admin registered successfully!" << endl;
+                    
+                    cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
+                    cout << "║                    REGISTERED ADMIN DETAILS                     ║" << endl;
+                    cout << "╠════════════════════════════════════════════════════════════════╣" << endl;
+                    cout << "║ Username: " << left << setw(47) << username << "║" << endl;
+                    cout << "║ Full Name: " << left << setw(46) << fullName << "║" << endl;
+                    cout << "║ Email: " << left << setw(50) << email << "║" << endl;
+                    cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+                } else {
+                    cout << "\n⚠️  Admin created but login failed! Please contact system administrator." << endl;
+                }
+            } else {
+                cout << "\n❌ Failed to retrieve admin ID!" << endl;
+            }
         } else {
             cout << "\n❌ Failed to register admin!" << endl;
         }
@@ -328,43 +386,8 @@ void Registration::registerAdmin() {
     pressEnterToContinue();
 }
 
-bool Registration::validateEmail(const string& email) {
-    if (email.empty()) return false;
-    size_t atPos = email.find('@');
-    size_t dotPos = email.find('.', atPos);
-    return (atPos != string::npos && dotPos != string::npos && dotPos > atPos);
-}
-
-bool Registration::validatePhone(const string& phone) {
-    if (phone.empty()) return false;
-    for (char c : phone) {
-        if (!isdigit(c) && c != '-' && c != ' ' && c != '(' && c != ')') {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool Registration::usernameExists(const string& username, const string& table) {
-    string query = "SELECT COUNT(*) as count FROM " + table + " WHERE username = '" + username + "'";
-    sql::ResultSet* res = db->executeSelect(query);
-    if (res && res->next()) {
-        int count = res->getInt("count");
-        delete res;
-        return count > 0;
-    }
-    return false;
-}
-
-bool Registration::emailExists(const string& email, const string& table) {
-    string query = "SELECT COUNT(*) as count FROM " + table + " WHERE email = '" + email + "'";
-    sql::ResultSet* res = db->executeSelect(query);
-    if (res && res->next()) {
-        int count = res->getInt("count");
-        delete res;
-        return count > 0;
-    }
-    return false;
+bool Registration::validatePassword(const string& password1, const string& password2) {
+    return password1 == password2;
 }
 
 void Registration::displayTableHeader(const string& title) {
@@ -381,3 +404,9 @@ void Registration::pressEnterToContinue() {
     cin.get();
 }
 
+string Registration::getStringInput(const string& prompt) {
+    cout << prompt;
+    string input;
+    getline(cin, input);
+    return input;
+}

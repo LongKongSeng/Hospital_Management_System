@@ -15,26 +15,34 @@ private:
 
 public:
     AdminModule(Database* database);
-    void showMenu();
-    void managePatients();
-    void manageInventory();
-    void viewInventoryReports();
-    void createPatient();
-    void readPatients();
-    void updatePatient();
-    void deletePatient();
-    void createInventory();
-    void readInventory();
-    void updateInventory();
-    void deleteInventory();
-    void updateInventoryQuantity();
-    void displayPatientTable(sql::ResultSet* res);
-    void displayInventoryTable(sql::ResultSet* res);
+    void showMenu(); // Main admin menu from flowchart
+    
+    // Admin Module Functions (from flowchart)
+    void viewPharmacy();
+    void generateHospitalReport();
+    void addPatient();
+    void patientReceipt();
+    
+    // Pharmacy View Functions
+    void displayPharmacyList();
+    void filterPharmacyByCategory();
+    void displayPharmacyGraphical();
+    
+    // Report Generation Functions
+    void generateMonthlyReport();
+    void generateYearlyReport();
+    void displayGraphicalReport();
+    
+    // Patient Receipt Functions
+    void calculatePatientReceipt(int patientId);
+    void displayReceipt(int patientId, double totalAmount);
+    
+    // Helper Functions
     void displayTableHeader(const string& title);
     void pressEnterToContinue();
     int getIntInput(const string& prompt);
     string getStringInput(const string& prompt);
+    void displayPharmacyTable(sql::ResultSet* res);
 };
 
 #endif
-

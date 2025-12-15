@@ -1,10 +1,12 @@
 ﻿#include <iostream>
 #include <windows.h>
+#include <iomanip>
 #include "Database.h"
 #include "Registration.h"
 #include "Login.h"
 #include "AdminModule.h"
-#include "StaffModule.h"
+#include "DoctorModule.h"
+#include "NurseModule.h"
 #include "Reports.h"
 
 using namespace std;
@@ -42,9 +44,10 @@ int main() {
 
     Registration registration(&db);
     Login login(&db);
-    AdminModule adminModule(&db);
+    AdminModule* adminModule = nullptr;
+    DoctorModule* doctorModule = nullptr;
+    NurseModule* nurseModule = nullptr;
     Reports reports(&db);
-    StaffModule* staffModule = nullptr;
 
     int mainChoice;
     bool loggedIn = false;
@@ -58,7 +61,7 @@ int main() {
 
             switch (mainChoice) {
             case 1:
-                registration.showMenu();
+                registration.showPreRegistrationMenu();
                 break;
             case 2:
                 login.showLoginMenu();
@@ -75,95 +78,57 @@ int main() {
                 cin.get();
             }
         } else {
-            // User is logged in - show appropriate menu
-            string userType = login.getCurrentUserType();
+            // User is logged in - route to appropriate module based on role
+            string role = login.getCurrentRole();
+            int userId = login.getCurrentUserId();
             
-            if (userType == "admin") {
-                int adminChoice;
-                do {
-                    system("cls");
-                    cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
-                    cout << "║                    ADMIN DASHBOARD                            ║" << endl;
-                    cout << "║                    Welcome, " << setw(30) << left << login.getCurrentUsername() << "║" << endl;
-                    cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
-                    cout << "\n╔════════════════════════════════════════╗" << endl;
-                    cout << "║  1. Admin Module                       ║" << endl;
-                    cout << "║  2. Reports & Analytics               ║" << endl;
-                    cout << "║  0. Logout                             ║" << endl;
-                    cout << "╚════════════════════════════════════════╝" << endl;
-                    cout << "\nEnter your choice: ";
-                    cin >> adminChoice;
-                    cin.ignore();
-                    
-                    switch (adminChoice) {
-                    case 1:
-                        adminModule.showMenu();
-                        break;
-                    case 2:
-                        reports.showMenu();
-                        break;
-                    case 0:
-                        login.logout();
-                        loggedIn = false;
-                        break;
-                    default:
-                        cout << "\n❌ Invalid choice!" << endl;
-                        cout << "Press Enter to continue...";
-                        cin.get();
-                    }
-                } while (adminChoice != 0 && loggedIn);
+            if (role == "Admin") {
+                if (!adminModule) {
+                    adminModule = new AdminModule(&db);
+                }
+                adminModule->showMenu();
                 
-                // After admin module returns, ask if they want to logout
-                cout << "\nDo you want to logout? (yes/no): ";
-                string logoutChoice;
-                getline(cin, logoutChoice);
-                if (logoutChoice == "yes" || logoutChoice == "YES") {
-                    login.logout();
-                    loggedIn = false;
-                }
-            } else if (userType == "staff") {
-                if (!staffModule) {
-                    staffModule = new StaffModule(&db, login.getCurrentUserId());
-                }
+                // After admin module returns, logout
+                login.logout();
+                loggedIn = false;
+                delete adminModule;
+                adminModule = nullptr;
                 
-                system("cls");
-                cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
-                cout << "║                    STAFF DASHBOARD                            ║" << endl;
-                cout << "║                    Welcome, " << setw(30) << left << login.getCurrentUsername() << "║" << endl;
-                cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
-                staffModule->showMenu();
+            } else if (role == "Doctor") {
+                if (!doctorModule) {
+                    doctorModule = new DoctorModule(&db, userId);
+                }
+                doctorModule->showMenu();
                 
-                // After staff module returns, ask if they want to logout
-                cout << "\nDo you want to logout? (yes/no): ";
-                string logoutChoice;
-                getline(cin, logoutChoice);
-                if (logoutChoice == "yes" || logoutChoice == "YES") {
-                    login.logout();
-                    loggedIn = false;
-                    delete staffModule;
-                    staffModule = nullptr;
+                // After doctor module returns, logout
+                login.logout();
+                loggedIn = false;
+                delete doctorModule;
+                doctorModule = nullptr;
+                
+            } else if (role == "Nurse") {
+                if (!nurseModule) {
+                    nurseModule = new NurseModule(&db, userId);
                 }
-            } else if (userType == "patient") {
-                system("cls");
-                cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
-                cout << "║                    PATIENT DASHBOARD                           ║" << endl;
-                cout << "║                    Welcome, " << setw(30) << left << login.getCurrentUsername() << "║" << endl;
-                cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
-                cout << "\nPatient module features coming soon!" << endl;
-                cout << "\nDo you want to logout? (yes/no): ";
-                string logoutChoice;
-                getline(cin, logoutChoice);
-                if (logoutChoice == "yes" || logoutChoice == "YES") {
-                    login.logout();
-                    loggedIn = false;
-                }
+                nurseModule->showMenu();
+                
+                // After nurse module returns, logout
+                login.logout();
+                loggedIn = false;
+                delete nurseModule;
+                nurseModule = nullptr;
+            } else {
+                cout << "\n❌ Unknown role! Logging out..." << endl;
+                login.logout();
+                loggedIn = false;
             }
         }
     } while (mainChoice != 0);
 
-    if (staffModule) {
-        delete staffModule;
-    }
+    // Cleanup
+    if (adminModule) delete adminModule;
+    if (doctorModule) delete doctorModule;
+    if (nurseModule) delete nurseModule;
 
     db.disconnect();
     return 0;

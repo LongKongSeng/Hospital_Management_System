@@ -16,17 +16,14 @@ private:
 
 public:
     Registration(Database* database);
-    void showMenu();
-    void registerPatient();
-    void registerStaff();
+    void showPreRegistrationMenu(); // Pre-registration menu from flowchart
+    void registerDoctor();
+    void registerNurse();
     void registerAdmin();
-    bool validateEmail(const string& email);
-    bool validatePhone(const string& phone);
-    bool usernameExists(const string& username, const string& table);
-    bool emailExists(const string& email, const string& table);
+    bool validatePassword(const string& password1, const string& password2);
     void displayTableHeader(const string& title);
     void pressEnterToContinue();
+    string getStringInput(const string& prompt);
 };
 
 #endif
-
