@@ -60,13 +60,13 @@ void Registration::registerDoctor() {
                 if (firstAttempt && fullName == "0") {
                     return; // User wants to cancel
                 }
-                firstAttempt = false;
                 if (fullName.empty()) {
                     cout << "\n❌ Full name cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
                     system("cls");
                     displayTableHeader("DOCTOR REGISTRATION");
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -84,7 +84,6 @@ void Registration::registerDoctor() {
                 if (firstAttempt && gender == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (gender.empty()) {
                     cout << "\n❌ Gender cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -92,6 +91,7 @@ void Registration::registerDoctor() {
                     displayTableHeader("DOCTOR REGISTRATION");
                     cout << "\nEnter Full Name: " << fullName << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -109,7 +109,6 @@ void Registration::registerDoctor() {
                 if (firstAttempt && specialization == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (specialization.empty()) {
                     cout << "\n❌ Specialization cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -118,6 +117,7 @@ void Registration::registerDoctor() {
                     cout << "\nEnter Full Name: " << fullName << endl;
                     cout << "Enter Gender: " << gender << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -135,7 +135,6 @@ void Registration::registerDoctor() {
                 if (firstAttempt && contactNumber == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (contactNumber.empty()) {
                     cout << "\n❌ Contact number cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -145,6 +144,7 @@ void Registration::registerDoctor() {
                     cout << "Enter Gender: " << gender << endl;
                     cout << "Enter Specialization: " << specialization << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -162,7 +162,6 @@ void Registration::registerDoctor() {
                 if (firstAttempt && username == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (username.empty()) {
                     cout << "\n❌ Username cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -188,6 +187,7 @@ void Registration::registerDoctor() {
                         cout << "Enter Contact Number: " << contactNumber << endl;
                     } else {
                         if (checkRes) delete checkRes;
+                        firstAttempt = false;
                         validInput = true;
                     }
                 }
@@ -206,7 +206,6 @@ void Registration::registerDoctor() {
                 if (firstAttempt && password1 == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (password1.empty()) {
                     cout << "\n❌ Password cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -232,6 +231,7 @@ void Registration::registerDoctor() {
                         cout << "Enter Contact Number: " << contactNumber << endl;
                         cout << "Create Username: " << username << endl;
                     } else {
+                        firstAttempt = false;
                         validInput = true;
                     }
                 }
@@ -314,13 +314,13 @@ void Registration::registerNurse() {
                 if (firstAttempt && fullName == "0") {
                     return; // User wants to cancel
                 }
-                firstAttempt = false;
                 if (fullName.empty()) {
                     cout << "\n❌ Full name cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
                     system("cls");
                     displayTableHeader("NURSE REGISTRATION");
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -338,7 +338,6 @@ void Registration::registerNurse() {
                 if (firstAttempt && gender == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (gender.empty()) {
                     cout << "\n❌ Gender cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -346,6 +345,7 @@ void Registration::registerNurse() {
                     displayTableHeader("NURSE REGISTRATION");
                     cout << "\nEnter Full Name: " << fullName << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -363,7 +363,6 @@ void Registration::registerNurse() {
                 if (firstAttempt && contactNumber == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (contactNumber.empty()) {
                     cout << "\n❌ Contact number cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -372,6 +371,7 @@ void Registration::registerNurse() {
                     cout << "\nEnter Full Name: " << fullName << endl;
                     cout << "Enter Gender: " << gender << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -389,7 +389,6 @@ void Registration::registerNurse() {
                 if (firstAttempt && username == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (username.empty()) {
                     cout << "\n❌ Username cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -413,6 +412,7 @@ void Registration::registerNurse() {
                         cout << "Enter Contact Number: " << contactNumber << endl;
                     } else {
                         if (checkRes) delete checkRes;
+                        firstAttempt = false;
                         validInput = true;
                     }
                 }
@@ -431,7 +431,6 @@ void Registration::registerNurse() {
                 if (firstAttempt && password1 == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (password1.empty()) {
                     cout << "\n❌ Password cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -455,6 +454,7 @@ void Registration::registerNurse() {
                         cout << "Enter Contact Number: " << contactNumber << endl;
                         cout << "Create Username: " << username << endl;
                     } else {
+                        firstAttempt = false;
                         validInput = true;
                     }
                 }
@@ -535,13 +535,13 @@ void Registration::registerAdmin() {
                 if (firstAttempt && fullName == "0") {
                     return; // User wants to cancel
                 }
-                firstAttempt = false;
                 if (fullName.empty()) {
                     cout << "\n❌ Full name cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
                     system("cls");
                     displayTableHeader("ADMIN REGISTRATION");
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -559,7 +559,6 @@ void Registration::registerAdmin() {
                 if (firstAttempt && email == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (email.empty() || email.find('@') == string::npos) {
                     cout << "\n❌ Invalid email format! Please try again." << endl;
                     pressEnterToContinue();
@@ -567,6 +566,7 @@ void Registration::registerAdmin() {
                     displayTableHeader("ADMIN REGISTRATION");
                     cout << "\nEnter Full Name: " << fullName << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -584,7 +584,6 @@ void Registration::registerAdmin() {
                 if (firstAttempt && contactNumber == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (contactNumber.empty()) {
                     cout << "\n❌ Contact number cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -593,6 +592,7 @@ void Registration::registerAdmin() {
                     cout << "\nEnter Full Name: " << fullName << endl;
                     cout << "Enter Email: " << email << endl;
                 } else {
+                    firstAttempt = false;
                     validInput = true;
                 }
             }
@@ -610,7 +610,6 @@ void Registration::registerAdmin() {
                 if (firstAttempt && username == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (username.empty()) {
                     cout << "\n❌ Username cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -634,6 +633,7 @@ void Registration::registerAdmin() {
                         cout << "Enter Contact Number: " << contactNumber << endl;
                     } else {
                         if (checkRes) delete checkRes;
+                        firstAttempt = false;
                         validInput = true;
                     }
                 }
@@ -652,7 +652,6 @@ void Registration::registerAdmin() {
                 if (firstAttempt && password1 == "0") {
                     return;
                 }
-                firstAttempt = false;
                 if (password1.empty()) {
                     cout << "\n❌ Password cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -676,6 +675,7 @@ void Registration::registerAdmin() {
                         cout << "Enter Contact Number: " << contactNumber << endl;
                         cout << "Create Username: " << username << endl;
                     } else {
+                        firstAttempt = false;
                         validInput = true;
                     }
                 }
