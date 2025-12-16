@@ -47,14 +47,20 @@ void Registration::registerDoctor() {
 
         try {
             bool validInput = false;
+            bool firstAttempt = true;
             
             // Full Name
             while (!validInput) {
-                cout << "\nEnter Full Name (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "\nEnter Full Name (or '0' to cancel): ";
+                } else {
+                    cout << "\nEnter Full Name: ";
+                }
                 getline(cin, fullName);
-                if (fullName == "0") {
+                if (firstAttempt && fullName == "0") {
                     return; // User wants to cancel
                 }
+                firstAttempt = false;
                 if (fullName.empty()) {
                     cout << "\n❌ Full name cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -66,13 +72,19 @@ void Registration::registerDoctor() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Gender
             while (!validInput) {
-                cout << "Enter Gender (Male/Female/Other) (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Gender (Male/Female/Other) (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Gender (Male/Female/Other): ";
+                }
                 getline(cin, gender);
-                if (gender == "0") {
+                if (firstAttempt && gender == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (gender.empty()) {
                     cout << "\n❌ Gender cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -85,13 +97,19 @@ void Registration::registerDoctor() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Specialization
             while (!validInput) {
-                cout << "Enter Specialization (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Specialization (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Specialization: ";
+                }
                 getline(cin, specialization);
-                if (specialization == "0") {
+                if (firstAttempt && specialization == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (specialization.empty()) {
                     cout << "\n❌ Specialization cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -105,13 +123,19 @@ void Registration::registerDoctor() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Contact Number
             while (!validInput) {
-                cout << "Enter Contact Number (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Contact Number (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Contact Number: ";
+                }
                 getline(cin, contactNumber);
-                if (contactNumber == "0") {
+                if (firstAttempt && contactNumber == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (contactNumber.empty()) {
                     cout << "\n❌ Contact number cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -126,13 +150,19 @@ void Registration::registerDoctor() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Username
             while (!validInput) {
-                cout << "Create Username (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Create Username (or '0' to cancel): ";
+                } else {
+                    cout << "Create Username: ";
+                }
                 getline(cin, username);
-                if (username == "0") {
+                if (firstAttempt && username == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (username.empty()) {
                     cout << "\n❌ Username cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -164,13 +194,19 @@ void Registration::registerDoctor() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Password
             while (!validInput) {
-                cout << "Create Password (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Create Password (or '0' to cancel): ";
+                } else {
+                    cout << "Create Password: ";
+                }
                 getline(cin, password1);
-                if (password1 == "0") {
+                if (firstAttempt && password1 == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (password1.empty()) {
                     cout << "\n❌ Password cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -265,14 +301,20 @@ void Registration::registerNurse() {
 
         try {
             bool validInput = false;
+            bool firstAttempt = true;
             
             // Full Name
             while (!validInput) {
-                cout << "\nEnter Full Name (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "\nEnter Full Name (or '0' to cancel): ";
+                } else {
+                    cout << "\nEnter Full Name: ";
+                }
                 getline(cin, fullName);
-                if (fullName == "0") {
+                if (firstAttempt && fullName == "0") {
                     return; // User wants to cancel
                 }
+                firstAttempt = false;
                 if (fullName.empty()) {
                     cout << "\n❌ Full name cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -284,13 +326,19 @@ void Registration::registerNurse() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Gender
             while (!validInput) {
-                cout << "Enter Gender (Male/Female/Other) (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Gender (Male/Female/Other) (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Gender (Male/Female/Other): ";
+                }
                 getline(cin, gender);
-                if (gender == "0") {
+                if (firstAttempt && gender == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (gender.empty()) {
                     cout << "\n❌ Gender cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -303,13 +351,19 @@ void Registration::registerNurse() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Contact Number
             while (!validInput) {
-                cout << "Enter Contact Number (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Contact Number (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Contact Number: ";
+                }
                 getline(cin, contactNumber);
-                if (contactNumber == "0") {
+                if (firstAttempt && contactNumber == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (contactNumber.empty()) {
                     cout << "\n❌ Contact number cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -323,13 +377,19 @@ void Registration::registerNurse() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Username
             while (!validInput) {
-                cout << "Create Username (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Create Username (or '0' to cancel): ";
+                } else {
+                    cout << "Create Username: ";
+                }
                 getline(cin, username);
-                if (username == "0") {
+                if (firstAttempt && username == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (username.empty()) {
                     cout << "\n❌ Username cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -359,13 +419,19 @@ void Registration::registerNurse() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Password
             while (!validInput) {
-                cout << "Create Password (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Create Password (or '0' to cancel): ";
+                } else {
+                    cout << "Create Password: ";
+                }
                 getline(cin, password1);
-                if (password1 == "0") {
+                if (firstAttempt && password1 == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (password1.empty()) {
                     cout << "\n❌ Password cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -456,14 +522,20 @@ void Registration::registerAdmin() {
 
         try {
             bool validInput = false;
+            bool firstAttempt = true;
             
             // Full Name
             while (!validInput) {
-                cout << "\nEnter Full Name (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "\nEnter Full Name (or '0' to cancel): ";
+                } else {
+                    cout << "\nEnter Full Name: ";
+                }
                 getline(cin, fullName);
-                if (fullName == "0") {
+                if (firstAttempt && fullName == "0") {
                     return; // User wants to cancel
                 }
+                firstAttempt = false;
                 if (fullName.empty()) {
                     cout << "\n❌ Full name cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -475,13 +547,19 @@ void Registration::registerAdmin() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Email
             while (!validInput) {
-                cout << "Enter Email (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Email (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Email: ";
+                }
                 getline(cin, email);
-                if (email == "0") {
+                if (firstAttempt && email == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (email.empty() || email.find('@') == string::npos) {
                     cout << "\n❌ Invalid email format! Please try again." << endl;
                     pressEnterToContinue();
@@ -494,13 +572,19 @@ void Registration::registerAdmin() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Contact Number
             while (!validInput) {
-                cout << "Enter Contact Number (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Enter Contact Number (or '0' to cancel): ";
+                } else {
+                    cout << "Enter Contact Number: ";
+                }
                 getline(cin, contactNumber);
-                if (contactNumber == "0") {
+                if (firstAttempt && contactNumber == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (contactNumber.empty()) {
                     cout << "\n❌ Contact number cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -514,13 +598,19 @@ void Registration::registerAdmin() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Username
             while (!validInput) {
-                cout << "Create Username (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Create Username (or '0' to cancel): ";
+                } else {
+                    cout << "Create Username: ";
+                }
                 getline(cin, username);
-                if (username == "0") {
+                if (firstAttempt && username == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (username.empty()) {
                     cout << "\n❌ Username cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
@@ -550,13 +640,19 @@ void Registration::registerAdmin() {
             }
 
             validInput = false;
+            firstAttempt = true;
             // Password
             while (!validInput) {
-                cout << "Create Password (or '0' to cancel): ";
+                if (firstAttempt) {
+                    cout << "Create Password (or '0' to cancel): ";
+                } else {
+                    cout << "Create Password: ";
+                }
                 getline(cin, password1);
-                if (password1 == "0") {
+                if (firstAttempt && password1 == "0") {
                     return;
                 }
+                firstAttempt = false;
                 if (password1.empty()) {
                     cout << "\n❌ Password cannot be empty! Please try again." << endl;
                     pressEnterToContinue();
