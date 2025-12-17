@@ -1,4 +1,5 @@
 #include "DoctorModule.h"
+#include "ColorUtils.h"
 
 DoctorModule::DoctorModule(Database* database, int doctorId) : db(database), currentDoctorId(doctorId) {}
 
@@ -7,14 +8,44 @@ void DoctorModule::showMenu() {
     do {
         system("cls");
         displayTableHeader("DOCTOR MODULE");
+        
+        // Yellow color theme for doctor menu
+        ColorUtils::setColor(YELLOW);
         cout << "\n╔════════════════════════════════════════╗" << endl;
-        cout << "║  1. View Patient Record              ║" << endl;
-        cout << "║  2. Generate Next Appointment        ║" << endl;
-        cout << "║  3. Make Diagnosis                   ║" << endl;
-        cout << "║  4. Edit Patient Medical Record      ║" << endl;
-        cout << "║  5. Main Menu                       ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(WHITE);
+        cout << "║  ";
+        ColorUtils::printColored("1. View Patient Record", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "              ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("2. Generate Next Appointment", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "        ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("3. Make Diagnosis", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "                   ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("4. Edit Patient Medical Record", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "      ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("5. Main Menu", RED);
+        ColorUtils::setColor(WHITE);
+        cout << "                       ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(YELLOW);
         cout << "╚════════════════════════════════════════╝" << endl;
-        cout << "\nEnter your choice: ";
+        ColorUtils::resetColor();
+        
+        ColorUtils::printColored("\nEnter your choice: ", CYAN);
         cin >> choice;
         cin.ignore();
 
@@ -428,12 +459,26 @@ void DoctorModule::displayMedicalRecordTable(sql::ResultSet* res) {
 }
 
 void DoctorModule::displayTableHeader(const string& title) {
+    // Yellow theme header
+    ColorUtils::setColor(YELLOW);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║" << setw(60) << "" << "║" << endl;
-    cout << "║" << setw((60 - title.length()) / 2 + title.length()) << right << title 
-         << setw((60 - title.length()) / 2) << "" << "║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title
+    ColorUtils::setColor(WHITE);
+    cout << "║";
+    int padding = (60 - title.length()) / 2;
+    for (int i = 0; i < padding; i++) cout << " ";
+    ColorUtils::printColoredBG(title, BLACK, YELLOW);
+    for (int i = 0; i < (60 - title.length() - padding); i++) cout << " ";
+    ColorUtils::setColor(WHITE);
+    cout << "║" << endl;
+    
+    ColorUtils::setColor(YELLOW);
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }
 
 void DoctorModule::pressEnterToContinue() {
@@ -458,4 +503,6 @@ string DoctorModule::getStringInput(const string& prompt) {
     getline(cin, input);
     return input;
 }
+
+
 

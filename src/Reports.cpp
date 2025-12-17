@@ -1,4 +1,5 @@
 #include "Reports.h"
+#include "ColorUtils.h"
 
 Reports::Reports(Database* database) : db(database) {}
 
@@ -7,32 +8,125 @@ void Reports::showMenu() {
     do {
         system("cls");
         displayTableHeader("REPORTS & ANALYTICS MODULE");
+        
+        // Bright White/Yellow color theme for reports menu
+        ColorUtils::setColor(WHITE);
         cout << "\n╔════════════════════════════════════════╗" << endl;
-        cout << "║  COMPLEX CALCULATIONS:                  ║" << endl;
-        cout << "║  1. Total Inventory Value              ║" << endl;
-        cout << "║  2. Category Statistics               ║" << endl;
-        cout << "║  3. Monthly Sales Analysis            ║" << endl;
-        cout << "║  4. Profit Margin Analysis             ║" << endl;
-        cout << "║  5. Patient Statistics                 ║" << endl;
-        cout << "║  6. Prescription Statistics            ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(WHITE);
+        cout << "║  ";
+        ColorUtils::printColored("COMPLEX CALCULATIONS:", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "                  ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("1. Total Inventory Value", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "              ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("2. Category Statistics", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "               ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("3. Monthly Sales Analysis", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "            ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("4. Profit Margin Analysis", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "             ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("5. Patient Statistics", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "                 ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("6. Prescription Statistics", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "            ║" << endl;
+        
         cout << "║                                        ║" << endl;
-        cout << "║  REPORT GENERATION:                   ║" << endl;
-        cout << "║  7. Inventory Report                  ║" << endl;
-        cout << "║  8. Patient Report                    ║" << endl;
-        cout << "║  9. Prescription Report                ║" << endl;
-        cout << "║  10. Financial Report                  ║" << endl;
-        cout << "║  11. Low Stock Report                 ║" << endl;
-        cout << "║  12. Expiring Items Report            ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("REPORT GENERATION:", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "                   ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("7. Inventory Report", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "                  ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("8. Patient Report", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "                    ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("9. Prescription Report", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "                ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("10. Financial Report", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "                  ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("11. Low Stock Report", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "                 ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("12. Expiring Items Report", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "            ║" << endl;
+        
         cout << "║                                        ║" << endl;
-        cout << "║  CHARTS & GRAPHS:                     ║" << endl;
-        cout << "║  13. Inventory Value Chart            ║" << endl;
-        cout << "║  14. Category Distribution Chart      ║" << endl;
-        cout << "║  15. Monthly Transaction Chart        ║" << endl;
-        cout << "║  16. Patient Status Chart             ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("CHARTS & GRAPHS:", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "                     ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("13. Inventory Value Chart", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "            ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("14. Category Distribution Chart", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "      ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("15. Monthly Transaction Chart", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "        ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("16. Patient Status Chart", WHITE);
+        ColorUtils::setColor(WHITE);
+        cout << "             ║" << endl;
+        
         cout << "║                                        ║" << endl;
-        cout << "║  0. Back to Main Menu                 ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("0. Back to Main Menu", RED);
+        ColorUtils::setColor(WHITE);
+        cout << "                 ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(WHITE);
         cout << "╚════════════════════════════════════════╝" << endl;
-        cout << "\nEnter your choice: ";
+        ColorUtils::resetColor();
+        
+        ColorUtils::printColored("\nEnter your choice: ", CYAN);
         cin >> choice;
         cin.ignore();
 
@@ -791,12 +885,26 @@ void Reports::displayVerticalBar(const string& label, double value, double maxVa
 }
 
 void Reports::displayTableHeader(const string& title) {
+    // Bright White/Yellow theme header
+    ColorUtils::setColor(WHITE);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║" << setw(60) << "" << "║" << endl;
-    cout << "║" << setw((60 - title.length()) / 2 + title.length()) << right << title 
-         << setw((60 - title.length()) / 2) << "" << "║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title
+    ColorUtils::setColor(WHITE);
+    cout << "║";
+    int padding = (60 - title.length()) / 2;
+    for (int i = 0; i < padding; i++) cout << " ";
+    ColorUtils::printColoredBG(title, BLACK, YELLOW);
+    for (int i = 0; i < (60 - title.length() - padding); i++) cout << " ";
+    ColorUtils::setColor(WHITE);
+    cout << "║" << endl;
+    
+    ColorUtils::setColor(WHITE);
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }
 
 void Reports::pressEnterToContinue() {

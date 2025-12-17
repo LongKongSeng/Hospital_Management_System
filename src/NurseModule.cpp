@@ -1,4 +1,5 @@
 #include "NurseModule.h"
+#include "ColorUtils.h"
 
 NurseModule::NurseModule(Database* database, int nurseId) : db(database), currentNurseId(nurseId) {}
 
@@ -7,12 +8,34 @@ void NurseModule::showMenu() {
     do {
         system("cls");
         displayTableHeader("NURSE MODULE");
+        
+        // Cyan color theme for nurse menu
+        ColorUtils::setColor(CYAN);
         cout << "\n╔════════════════════════════════════════╗" << endl;
-        cout << "║  1. View Patient Record              ║" << endl;
-        cout << "║  2. Generate Next Appointment        ║" << endl;
-        cout << "║  3. Main Menu                       ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(WHITE);
+        cout << "║  ";
+        ColorUtils::printColored("1. View Patient Record", CYAN);
+        ColorUtils::setColor(WHITE);
+        cout << "              ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("2. Generate Next Appointment", CYAN);
+        ColorUtils::setColor(WHITE);
+        cout << "        ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("3. Main Menu", RED);
+        ColorUtils::setColor(WHITE);
+        cout << "                       ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(CYAN);
         cout << "╚════════════════════════════════════════╝" << endl;
-        cout << "\nEnter your choice: ";
+        ColorUtils::resetColor();
+        
+        ColorUtils::printColored("\nEnter your choice: ", CYAN);
         cin >> choice;
         cin.ignore();
 
@@ -236,12 +259,26 @@ void NurseModule::displayAppointmentTable(sql::ResultSet* res) {
 }
 
 void NurseModule::displayTableHeader(const string& title) {
+    // Cyan theme header
+    ColorUtils::setColor(CYAN);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║" << setw(60) << "" << "║" << endl;
-    cout << "║" << setw((60 - title.length()) / 2 + title.length()) << right << title 
-         << setw((60 - title.length()) / 2) << "" << "║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title
+    ColorUtils::setColor(WHITE);
+    cout << "║";
+    int padding = (60 - title.length()) / 2;
+    for (int i = 0; i < padding; i++) cout << " ";
+    ColorUtils::printColoredBG(title, YELLOW, CYAN);
+    for (int i = 0; i < (60 - title.length() - padding); i++) cout << " ";
+    ColorUtils::setColor(WHITE);
+    cout << "║" << endl;
+    
+    ColorUtils::setColor(CYAN);
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }
 
 void NurseModule::pressEnterToContinue() {
@@ -266,4 +303,6 @@ string NurseModule::getStringInput(const string& prompt) {
     getline(cin, input);
     return input;
 }
+
+
 

@@ -1,4 +1,5 @@
 #include "StaffModule.h"
+#include "ColorUtils.h"
 
 StaffModule::StaffModule(Database* database, int staffId) : db(database), currentStaffId(staffId) {}
 
@@ -7,15 +8,49 @@ void StaffModule::showMenu() {
     do {
         system("cls");
         displayTableHeader("STAFF MODULE");
+        
+        // Blue color theme for staff menu
+        ColorUtils::setColor(BLUE);
         cout << "\n╔════════════════════════════════════════╗" << endl;
-        cout << "║  1. View Patient Status               ║" << endl;
-        cout << "║  2. Update Patient Status              ║" << endl;
-        cout << "║  3. Update Patient Prescription        ║" << endl;
-        cout << "║  4. Delete Finished Prescriptions      ║" << endl;
-        cout << "║  5. Update Patient Report              ║" << endl;
-        cout << "║  0. Back to Main Menu                 ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(WHITE);
+        cout << "║  ";
+        ColorUtils::printColored("1. View Patient Status", BLUE);
+        ColorUtils::setColor(WHITE);
+        cout << "               ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("2. Update Patient Status", BLUE);
+        ColorUtils::setColor(WHITE);
+        cout << "              ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("3. Update Patient Prescription", BLUE);
+        ColorUtils::setColor(WHITE);
+        cout << "        ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("4. Delete Finished Prescriptions", BLUE);
+        ColorUtils::setColor(WHITE);
+        cout << "      ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("5. Update Patient Report", BLUE);
+        ColorUtils::setColor(WHITE);
+        cout << "              ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("0. Back to Main Menu", RED);
+        ColorUtils::setColor(WHITE);
+        cout << "                 ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(BLUE);
         cout << "╚════════════════════════════════════════╝" << endl;
-        cout << "\nEnter your choice: ";
+        ColorUtils::resetColor();
+        
+        ColorUtils::printColored("\nEnter your choice: ", CYAN);
         cin >> choice;
         cin.ignore();
 
@@ -637,12 +672,26 @@ void StaffModule::displayReportTable(sql::ResultSet* res) {
 }
 
 void StaffModule::displayTableHeader(const string& title) {
+    // Blue theme header
+    ColorUtils::setColor(BLUE);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║" << setw(60) << "" << "║" << endl;
-    cout << "║" << setw((60 - title.length()) / 2 + title.length()) << right << title 
-         << setw((60 - title.length()) / 2) << "" << "║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title
+    ColorUtils::setColor(WHITE);
+    cout << "║";
+    int padding = (60 - title.length()) / 2;
+    for (int i = 0; i < padding; i++) cout << " ";
+    ColorUtils::printColoredBG(title, YELLOW, BLUE);
+    for (int i = 0; i < (60 - title.length() - padding); i++) cout << " ";
+    ColorUtils::setColor(WHITE);
+    cout << "║" << endl;
+    
+    ColorUtils::setColor(BLUE);
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }
 
 void StaffModule::pressEnterToContinue() {

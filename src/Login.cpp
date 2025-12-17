@@ -1,4 +1,5 @@
 #include "Login.h"
+#include "ColorUtils.h"
 
 Login::Login(Database* database) : db(database), currentUserId(-1), currentUserType(""), currentUsername(""), currentRole("") {}
 
@@ -45,34 +46,38 @@ void Login::showLoginMenu() {
     
     string username, password;
 
-    cout << "\nEnter Username: ";
+    ColorUtils::printColored("\nEnter Username: ", RED);
     getline(cin, username);
     
     if (username.empty()) {
-        cout << "\n❌ Username cannot be empty!" << endl;
-        cout << "Press Enter to continue...";
+        ColorUtils::printColored("\n❌ Username cannot be empty!\n", RED);
+        ColorUtils::printColored("Press Enter to continue...", YELLOW);
         cin.get();
         return;
     }
 
-    cout << "Enter Password: ";
+    ColorUtils::printColored("Enter Password: ", RED);
     getline(cin, password);
     
     if (password.empty()) {
-        cout << "\n❌ Password cannot be empty!" << endl;
-        cout << "Press Enter to continue...";
+        ColorUtils::printColored("\n❌ Password cannot be empty!\n", RED);
+        ColorUtils::printColored("Press Enter to continue...", YELLOW);
         cin.get();
         return;
     }
 
     if (authenticate(username, password)) {
-        cout << "\n✅ Login successful! Welcome, " << currentUsername << "!" << endl;
-        cout << "Role: " << currentRole << endl;
-        cout << "Press Enter to continue...";
+        ColorUtils::printColored("\n✅ Login successful! Welcome, ", GREEN);
+        ColorUtils::printColored(currentUsername, CYAN);
+        ColorUtils::printColored("!\n", GREEN);
+        cout << "Role: ";
+        ColorUtils::printColored(currentRole, YELLOW);
+        cout << endl;
+        ColorUtils::printColored("Press Enter to continue...", YELLOW);
         cin.get();
     } else {
-        cout << "\n❌ Invalid username or password!" << endl;
-        cout << "Press Enter to continue...";
+        ColorUtils::printColored("\n❌ Invalid username or password!\n", RED);
+        ColorUtils::printColored("Press Enter to continue...", YELLOW);
         cin.get();
     }
 }
@@ -101,10 +106,24 @@ void Login::logout() {
 }
 
 void Login::displayTableHeader(const string& title) {
+    // Red theme header
+    ColorUtils::setColor(RED);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║" << setw(60) << "" << "║" << endl;
-    cout << "║" << setw((60 - title.length()) / 2 + title.length()) << right << title 
-         << setw((60 - title.length()) / 2) << "" << "║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title
+    ColorUtils::setColor(WHITE);
+    cout << "║";
+    int padding = (60 - title.length()) / 2;
+    for (int i = 0; i < padding; i++) cout << " ";
+    ColorUtils::printColoredBG(title, YELLOW, RED);
+    for (int i = 0; i < (60 - title.length() - padding); i++) cout << " ";
+    ColorUtils::setColor(WHITE);
+    cout << "║" << endl;
+    
+    ColorUtils::setColor(RED);
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }

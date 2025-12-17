@@ -8,21 +8,54 @@
 #include "DoctorModule.h"
 #include "NurseModule.h"
 #include "Reports.h"
+#include "ColorUtils.h"
 
 using namespace std;
 
 void displayMainMenu() {
     system("cls");
+    
+    // Beautiful colorful header with highlighted title
+    ColorUtils::setColor(CYAN);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║                                                                ║" << endl;
-    cout << "║              HOSPITAL MANAGEMENT SYSTEM                        ║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title with bright cyan background
+    ColorUtils::printColoredBG("║              ", CYAN, BLACK);
+    ColorUtils::printColoredBG("HOSPITAL MANAGEMENT SYSTEM", YELLOW, CYAN);
+    ColorUtils::printColoredBG("                        ║\n", CYAN, BLACK);
+    
+    ColorUtils::setColor(CYAN);
     cout << "║                                                                ║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
+    
+    // Colorful menu options
+    ColorUtils::setColor(BLUE);
     cout << "\n╔════════════════════════════════════════╗" << endl;
-    cout << "║  1. Registration                        ║" << endl;
-    cout << "║  2. Login                              ║" << endl;
-    cout << "║  0. Exit                               ║" << endl;
+    ColorUtils::resetColor();
+    
+    ColorUtils::setColor(WHITE);
+    cout << "║  ";
+    ColorUtils::printColored("1. Registration", CYAN);
+    ColorUtils::setColor(WHITE);
+    cout << "                        ║" << endl;
+    
+    cout << "║  ";
+    ColorUtils::printColored("2. Login", CYAN);
+    ColorUtils::setColor(WHITE);
+    cout << "                              ║" << endl;
+    
+    cout << "║  ";
+    ColorUtils::printColored("0. Exit", RED);
+    ColorUtils::setColor(WHITE);
+    cout << "                               ║" << endl;
+    ColorUtils::resetColor();
+    
+    ColorUtils::setColor(BLUE);
     cout << "╚════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }
 
 int main() {

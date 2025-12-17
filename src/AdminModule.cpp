@@ -1,4 +1,5 @@
 #include "AdminModule.h"
+#include "ColorUtils.h"
 
 AdminModule::AdminModule(Database* database) : db(database) {}
 
@@ -7,14 +8,44 @@ void AdminModule::showMenu() {
     do {
         system("cls");
         displayTableHeader("ADMIN MODULE");
+        
+        // Green color theme for admin menu
+        ColorUtils::setColor(GREEN);
         cout << "\n╔════════════════════════════════════════╗" << endl;
-        cout << "║  1. View Pharmacy                     ║" << endl;
-        cout << "║  2. Generate Hospital Report          ║" << endl;
-        cout << "║  3. Add Patient                       ║" << endl;
-        cout << "║  4. Patient Receipt                   ║" << endl;
-        cout << "║  5. Return to Main Menu               ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(WHITE);
+        cout << "║  ";
+        ColorUtils::printColored("1. View Pharmacy", GREEN);
+        ColorUtils::setColor(WHITE);
+        cout << "                     ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("2. Generate Hospital Report", GREEN);
+        ColorUtils::setColor(WHITE);
+        cout << "          ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("3. Add Patient", GREEN);
+        ColorUtils::setColor(WHITE);
+        cout << "                       ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("4. Patient Receipt", GREEN);
+        ColorUtils::setColor(WHITE);
+        cout << "                   ║" << endl;
+        
+        cout << "║  ";
+        ColorUtils::printColored("5. Return to Main Menu", YELLOW);
+        ColorUtils::setColor(WHITE);
+        cout << "               ║" << endl;
+        ColorUtils::resetColor();
+        
+        ColorUtils::setColor(GREEN);
         cout << "╚════════════════════════════════════════╝" << endl;
-        cout << "\nEnter your choice: ";
+        ColorUtils::resetColor();
+        
+        ColorUtils::printColored("\nEnter your choice: ", CYAN);
         cin >> choice;
         cin.ignore();
 
@@ -676,12 +707,26 @@ void AdminModule::displayPharmacyTable(sql::ResultSet* res) {
 }
 
 void AdminModule::displayTableHeader(const string& title) {
+    // Green theme header
+    ColorUtils::setColor(GREEN);
     cout << "\n╔════════════════════════════════════════════════════════════════╗" << endl;
     cout << "║" << setw(60) << "" << "║" << endl;
-    cout << "║" << setw((60 - title.length()) / 2 + title.length()) << right << title 
-         << setw((60 - title.length()) / 2) << "" << "║" << endl;
+    ColorUtils::resetColor();
+    
+    // Highlighted title
+    ColorUtils::setColor(WHITE);
+    cout << "║";
+    int padding = (60 - title.length()) / 2;
+    for (int i = 0; i < padding; i++) cout << " ";
+    ColorUtils::printColoredBG(title, YELLOW, GREEN);
+    for (int i = 0; i < (60 - title.length() - padding); i++) cout << " ";
+    ColorUtils::setColor(WHITE);
+    cout << "║" << endl;
+    
+    ColorUtils::setColor(GREEN);
     cout << "║" << setw(60) << "" << "║" << endl;
     cout << "╚════════════════════════════════════════════════════════════════╝" << endl;
+    ColorUtils::resetColor();
 }
 
 void AdminModule::pressEnterToContinue() {
