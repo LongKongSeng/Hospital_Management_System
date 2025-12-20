@@ -173,11 +173,15 @@ void NurseModule::generateNextAppointment() {
         return;
     }
 
-    cout << "\nPatient: " << patientName << endl;
+    cout << "\n+----------------------------------------------------------------+" << endl;
+    cout << "|                    PATIENT INFORMATION                         |" << endl;
+    cout << "+----------------------------------------------------------------+" << endl;
+    cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+    cout << "+----------------------------------------------------------------+" << endl;
     cout << "\nAvailable Doctors:\n" << endl;
     cout << "+-----------+----------------------+----------------------+" << endl;
     cout << "| Doctor ID | Full Name            | Specialization       |" << endl;
-    cout << "+-----------┼----------------------┼----------------------+" << endl;
+    cout << "+-----------+----------------------+----------------------+" << endl;
     while (doctorRes->next()) {
         cout << "| " << setw(9) << doctorRes->getInt("doctor_id")
              << "| " << setw(20) << doctorRes->getString("full_name")
@@ -221,24 +225,39 @@ void NurseModule::generateNextAppointment() {
             "VALUES (" + to_string(patientId) + ", " + to_string(currentNurseId) + ", " + to_string(doctorId) + ", '" + appointmentDate + "', '" + appointmentTime + "', 'Scheduled')";
 
         if (db->executeUpdate(query)) {
-            cout << "\n✅ Next appointment generated successfully!" << endl;
-            cout << "Patient: " << patientName << endl;
-            cout << "Appointment Date: " << appointmentDate << endl;
-            cout << "Appointment Time: " << appointmentTime << endl;
-            
             // Update patient status: If next appointment exists -> Active, else Inactive
             string updateQuery = "UPDATE patient SET status = 'Active' WHERE patient_id = " + to_string(patientId);
             db->executeUpdate(updateQuery);
             
-            cout << "\nPatient status updated to: Active" << endl;
+            // Get doctor name for display
+            string getDoctorQuery = "SELECT full_name FROM doctor WHERE doctor_id = " + to_string(doctorId);
+            sql::ResultSet* doctorRes = db->executeSelect(getDoctorQuery);
+            string doctorName = "N/A";
+            if (doctorRes && doctorRes->next()) {
+                doctorName = doctorRes->getString("full_name");
+            }
+            if (doctorRes) delete doctorRes;
             
             // Show how many times patient has visited
             string visitQuery = "SELECT COUNT(*) as visit_count FROM appointment WHERE patient_id = " + to_string(patientId);
             sql::ResultSet* visitRes = db->executeSelect(visitQuery);
+            int visitCount = 0;
             if (visitRes && visitRes->next()) {
-                cout << "Total visits: " << visitRes->getInt("visit_count") << endl;
+                visitCount = visitRes->getInt("visit_count");
             }
             if (visitRes) delete visitRes;
+            
+            cout << "\n✅ Next appointment generated successfully!" << endl;
+            cout << "\n+----------------------------------------------------------------+" << endl;
+            cout << "|                    APPOINTMENT DETAILS                           |" << endl;
+            cout << "+----------------------------------------------------------------+" << endl;
+            cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+            cout << "| Doctor Name: " << left << setw(45) << doctorName << "|" << endl;
+            cout << "| Appointment Date: " << left << setw(41) << appointmentDate << "|" << endl;
+            cout << "| Appointment Time: " << left << setw(41) << appointmentTime << "|" << endl;
+            cout << "| Patient Status: " << left << setw(43) << "Active" << "|" << endl;
+            cout << "| Total Visits: " << left << setw(45) << visitCount << "|" << endl;
+            cout << "+----------------------------------------------------------------+" << endl;
         } else {
             cout << "\n❌ Failed to generate appointment!" << endl;
         }

@@ -126,20 +126,21 @@ void DoctorModule::viewAppointments() {
         sql::ResultSet* appointmentRes = db->executeSelect(appointmentQuery);
         
         if (appointmentRes && appointmentRes->rowsCount() > 0) {
-            cout << "\n+-----------------+-----------+----------------------+--------------+--------------+----------------------+" << endl;
-            cout << "| Appointment ID  | Patient ID| Patient Name          | Date         | Time         | Status               |" << endl;
-            cout << "+-----------------┼-----------┼----------------------┼--------------┼--------------┼----------------------+" << endl;
+            cout << "\n+-----------------+-----------+----------------------+----------------------+--------------+--------------+----------------------+" << endl;
+            cout << "| Appointment ID  | Patient ID| Patient Name          | Nurse Name            | Date         | Time         | Status               |" << endl;
+            cout << "+-----------------+-----------+----------------------+----------------------+--------------+--------------+----------------------+" << endl;
             
             while (appointmentRes->next()) {
                 cout << "| " << setw(15) << appointmentRes->getInt("appointment_id")
                      << "| " << setw(9) << appointmentRes->getInt("patient_id")
                      << "| " << setw(20) << appointmentRes->getString("patient_name")
+                     << "| " << setw(20) << appointmentRes->getString("nurse_name")
                      << "| " << setw(12) << appointmentRes->getString("appointment_date")
                      << "| " << setw(12) << appointmentRes->getString("appointment_time")
                      << "| " << setw(20) << appointmentRes->getString("status") << "|" << endl;
             }
             
-            cout << "+-----------------+-----------+----------------------+--------------+--------------+----------------------+" << endl;
+            cout << "+-----------------+-----------+----------------------+----------------------+--------------+--------------+----------------------+" << endl;
             
             // Show appointment count
             string countQuery = "SELECT COUNT(*) as total_count, "
@@ -149,10 +150,13 @@ void DoctorModule::viewAppointments() {
             
             sql::ResultSet* countRes = db->executeSelect(countQuery);
             if (countRes && countRes->next()) {
-                cout << "\nSummary:" << endl;
-                cout << "Total Appointments: " << countRes->getInt("total_count") << endl;
-                cout << "Scheduled: " << countRes->getInt("scheduled_count") << endl;
-                cout << "Completed: " << countRes->getInt("completed_count") << endl;
+                cout << "\n+----------------------------------------------------------------+" << endl;
+                cout << "|                    APPOINTMENT SUMMARY                          |" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
+                cout << "| Total Appointments: " << left << setw(41) << countRes->getInt("total_count") << "|" << endl;
+                cout << "| Scheduled: " << left << setw(48) << countRes->getInt("scheduled_count") << "|" << endl;
+                cout << "| Completed: " << left << setw(47) << countRes->getInt("completed_count") << "|" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
             }
             if (countRes) delete countRes;
         } else {
@@ -192,7 +196,12 @@ void DoctorModule::makeDiagnosis() {
     string patientName = checkRes->getString("full_name");
     delete checkRes;
 
-    cout << "\nPatient: " << patientName << endl;
+    cout << "\n+----------------------------------------------------------------+" << endl;
+    cout << "|                    PATIENT INFORMATION                         |" << endl;
+    cout << "+----------------------------------------------------------------+" << endl;
+    cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+    cout << "+----------------------------------------------------------------+" << endl;
+    cout << endl;
     
     string disease = getStringInput("Enter Disease: ");
     string disorder = getStringInput("Enter Disorder: ");
@@ -272,7 +281,17 @@ void DoctorModule::makeDiagnosis() {
 
                 if (db->executeUpdate(recordQuery)) {
                     cout << "\n✅ Diagnosis made successfully!" << endl;
-                    cout << "Medical record created for patient: " << patientName << endl;
+                    cout << "\n+----------------------------------------------------------------+" << endl;
+                    cout << "|                    DIAGNOSIS DETAILS                             |" << endl;
+                    cout << "+----------------------------------------------------------------+" << endl;
+                    cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+                    cout << "| Disease: " << left << setw(50) << (disease.empty() ? "N/A" : disease) << "|" << endl;
+                    cout << "| Disorder: " << left << setw(49) << (disorder.empty() ? "N/A" : disorder) << "|" << endl;
+                    cout << "| Duration of Pain: " << left << setw(41) << (durationOfPain.empty() ? "N/A" : durationOfPain) << "|" << endl;
+                    cout << "| Severity: " << left << setw(49) << (severity.empty() ? "N/A" : severity) << "|" << endl;
+                    cout << "| Date: " << left << setw(52) << (date == "CURDATE()" ? "Today" : date) << "|" << endl;
+                    cout << "| Medical Record: " << left << setw(43) << "Created" << "|" << endl;
+                    cout << "+----------------------------------------------------------------+" << endl;
                 } else {
                     cout << "\n⚠️  Diagnosis created but medical record failed!" << endl;
                 }
@@ -350,7 +369,11 @@ void DoctorModule::editPatientMedicalRecord() {
         delete recordRes;
         recordRes = db->executeSelect(recordQuery);
 
-        cout << "\nPatient: " << patientName << endl;
+        cout << "\n+----------------------------------------------------------------+" << endl;
+        cout << "|                    PATIENT INFORMATION                         |" << endl;
+        cout << "+----------------------------------------------------------------+" << endl;
+        cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+        cout << "+----------------------------------------------------------------+" << endl;
         cout << "\nMedical Record History:" << endl;
         displayMedicalRecordTable(recordRes);
         delete recordRes;
@@ -393,12 +416,15 @@ void DoctorModule::editPatientMedicalRecord() {
         }
 
         // Display current values and allow editing
-        cout << "\nCurrent Diagnosis Details:" << endl;
-        cout << "Disease: " << (currentDisease.empty() ? "N/A" : currentDisease) << endl;
-        cout << "Disorder: " << (currentDisorder.empty() ? "N/A" : currentDisorder) << endl;
-        cout << "Duration of Pain: " << (currentDuration.empty() ? "N/A" : currentDuration) << endl;
-        cout << "Severity: " << (currentSeverity.empty() ? "N/A" : currentSeverity) << endl;
-        cout << "Date: " << (currentDate.empty() ? "N/A" : currentDate) << endl;
+        cout << "\n+----------------------------------------------------------------+" << endl;
+        cout << "|                    CURRENT DIAGNOSIS DETAILS                    |" << endl;
+        cout << "+----------------------------------------------------------------+" << endl;
+        cout << "| Disease: " << left << setw(50) << (currentDisease.empty() ? "N/A" : currentDisease) << "|" << endl;
+        cout << "| Disorder: " << left << setw(49) << (currentDisorder.empty() ? "N/A" : currentDisorder) << "|" << endl;
+        cout << "| Duration of Pain: " << left << setw(41) << (currentDuration.empty() ? "N/A" : currentDuration) << "|" << endl;
+        cout << "| Severity: " << left << setw(49) << (currentSeverity.empty() ? "N/A" : currentSeverity) << "|" << endl;
+        cout << "| Date: " << left << setw(52) << (currentDate.empty() ? "N/A" : currentDate) << "|" << endl;
+        cout << "+----------------------------------------------------------------+" << endl;
 
         cout << "\nEnter new diagnosis details (press Enter to keep current value):" << endl;
         string disease = getStringInput("Disease: ");
@@ -425,6 +451,17 @@ void DoctorModule::editPatientMedicalRecord() {
 
             if (db->executeUpdate(updateQuery)) {
                 cout << "\n✅ Medical record updated successfully!" << endl;
+                cout << "\n+----------------------------------------------------------------+" << endl;
+                cout << "|                    UPDATED MEDICAL RECORD                        |" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
+                cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+                cout << "| Record ID: " << left << setw(48) << recordId << "|" << endl;
+                cout << "| Disease: " << left << setw(50) << (disease.empty() ? "Not changed" : disease) << "|" << endl;
+                cout << "| Disorder: " << left << setw(49) << (disorder.empty() ? "Not changed" : disorder) << "|" << endl;
+                cout << "| Duration of Pain: " << left << setw(41) << (durationOfPain.empty() ? "Not changed" : durationOfPain) << "|" << endl;
+                cout << "| Severity: " << left << setw(49) << (severity.empty() ? "Not changed" : severity) << "|" << endl;
+                cout << "| Date: " << left << setw(52) << (date.empty() ? "Not changed" : date) << "|" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
             } else {
                 cout << "\n❌ Failed to update medical record!" << endl;
             }

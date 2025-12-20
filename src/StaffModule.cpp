@@ -147,8 +147,12 @@ void StaffModule::updatePatientStatus() {
     string currentStatus = checkRes->isNull("status") ? "N/A" : checkRes->getString("status");
     delete checkRes;
 
-    cout << "\nPatient: " << currentName << endl;
-    cout << "Current Status: " << currentStatus << endl;
+    cout << "\n+----------------------------------------------------------------+" << endl;
+    cout << "|                    PATIENT STATUS INFORMATION                  |" << endl;
+    cout << "+----------------------------------------------------------------+" << endl;
+    cout << "| Patient Name: " << left << setw(44) << currentName << "|" << endl;
+    cout << "| Current Status: " << left << setw(42) << currentStatus << "|" << endl;
+    cout << "+----------------------------------------------------------------+" << endl;
     cout << "\nSelect new status:" << endl;
     cout << "1. Active" << endl;
     cout << "2. Inactive" << endl;
@@ -176,7 +180,13 @@ void StaffModule::updatePatientStatus() {
 
     if (db->executeUpdate(query)) {
         cout << "\n✅ Patient status updated successfully!" << endl;
-        cout << "Status changed from '" << currentStatus << "' to '" << newStatus << "'" << endl;
+        cout << "\n+----------------------------------------------------------------+" << endl;
+        cout << "|                    STATUS UPDATE DETAILS                       |" << endl;
+        cout << "+----------------------------------------------------------------+" << endl;
+        cout << "| Patient Name: " << left << setw(44) << currentName << "|" << endl;
+        cout << "| Previous Status: " << left << setw(41) << currentStatus << "|" << endl;
+        cout << "| New Status: " << left << setw(46) << newStatus << "|" << endl;
+        cout << "+----------------------------------------------------------------+" << endl;
     } else {
         cout << "\n❌ Failed to update patient status!" << endl;
     }
@@ -224,8 +234,6 @@ void StaffModule::updatePrescription() {
             string patientName = checkRes->getString("full_name");
             delete checkRes;
 
-            cout << "Patient: " << patientName << endl;
-            
             // First, show available medications from pharmacy
             string pharmacyQuery = "SELECT pharmacy_id, medicine_name, category_of_meds FROM pharmacy ORDER BY medicine_name";
             sql::ResultSet* pharmacyRes = db->executeSelect(pharmacyQuery);
@@ -258,11 +266,30 @@ void StaffModule::updatePrescription() {
                 date = "CURDATE()";
             }
 
+            // Get medication name for display
+            string getMedQuery = "SELECT medicine_name FROM pharmacy WHERE pharmacy_id = " + to_string(pharmacyId);
+            sql::ResultSet* medRes = db->executeSelect(getMedQuery);
+            string medicineName = "N/A";
+            if (medRes && medRes->next()) {
+                medicineName = medRes->getString("medicine_name");
+            }
+            if (medRes) delete medRes;
+            
             string query = "INSERT INTO prescription (pharmacy_id, dosage, duration_of_meds, instructions, date) "
                 "VALUES (" + to_string(pharmacyId) + ", '" + dosage + "', '" + durationOfMeds + "', '" + instructions + "', " + (date == "CURDATE()" ? date : "'" + date + "'") + ")";
 
             if (db->executeUpdate(query)) {
                 cout << "\n✅ Prescription added successfully!" << endl;
+                cout << "\n+----------------------------------------------------------------+" << endl;
+                cout << "|                    PRESCRIPTION DETAILS                         |" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
+                cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+                cout << "| Medication: " << left << setw(46) << medicineName << "|" << endl;
+                cout << "| Dosage: " << left << setw(51) << (dosage.empty() ? "N/A" : dosage) << "|" << endl;
+                cout << "| Duration: " << left << setw(49) << (durationOfMeds.empty() ? "N/A" : durationOfMeds) << "|" << endl;
+                cout << "| Instructions: " << left << setw(45) << (instructions.empty() ? "N/A" : (instructions.length() > 45 ? instructions.substr(0, 42) + "..." : instructions)) << "|" << endl;
+                cout << "| Date: " << left << setw(52) << (date == "CURDATE()" ? "Today" : date) << "|" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
             } else {
                 cout << "\n❌ Failed to add prescription!" << endl;
             }
@@ -494,7 +521,12 @@ void StaffModule::updatePatientReport() {
             string patientName = checkRes->getString("full_name");
             delete checkRes;
 
-            cout << "Patient: " << patientName << endl;
+            cout << "\n+----------------------------------------------------------------+" << endl;
+            cout << "|                    PATIENT INFORMATION                         |" << endl;
+            cout << "+----------------------------------------------------------------+" << endl;
+            cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+            cout << "+----------------------------------------------------------------+" << endl;
+            cout << endl;
             
             string reportType = getStringInput("Report Type: ");
             string reportDate = getStringInput("Report Date (YYYY-MM-DD): ");
@@ -531,6 +563,15 @@ void StaffModule::updatePatientReport() {
 
             if (db->executeUpdate(query)) {
                 cout << "\n✅ Report added successfully!" << endl;
+                cout << "\n+----------------------------------------------------------------+" << endl;
+                cout << "|                    REPORT DETAILS                                |" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
+                cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+                cout << "| Report Type: " << left << setw(46) << (reportType.empty() ? "N/A" : reportType) << "|" << endl;
+                cout << "| Report Date: " << left << setw(46) << (reportDate.empty() ? "N/A" : reportDate) << "|" << endl;
+                cout << "| Diagnosis: " << left << setw(48) << (diagnosis.empty() ? "N/A" : (diagnosis.length() > 48 ? diagnosis.substr(0, 45) + "..." : diagnosis)) << "|" << endl;
+                cout << "| Treatment: " << left << setw(48) << (treatment.empty() ? "N/A" : (treatment.length() > 48 ? treatment.substr(0, 45) + "..." : treatment)) << "|" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
             } else {
                 cout << "\n❌ Failed to add report!" << endl;
             }
@@ -570,6 +611,15 @@ void StaffModule::updatePatientReport() {
                 return;
             }
 
+            // Get patient name for display
+            string getPatientQuery = "SELECT pt.full_name FROM medical_record mr JOIN patient pt ON mr.patient_id = pt.patient_id WHERE mr.record_id = " + to_string(recordId);
+            sql::ResultSet* patientRes = db->executeSelect(getPatientQuery);
+            string patientName = "N/A";
+            if (patientRes && patientRes->next()) {
+                patientName = patientRes->getString("full_name");
+            }
+            if (patientRes) delete patientRes;
+
             cout << "\nEnter new details (press Enter to keep current value):" << endl;
             string reportType = getStringInput("Report Type: ");
             string reportDate = getStringInput("Report Date (YYYY-MM-DD): ");
@@ -605,6 +655,14 @@ void StaffModule::updatePatientReport() {
 
             if (db->executeUpdate(query)) {
                 cout << "\n✅ Report updated successfully!" << endl;
+                cout << "\n+----------------------------------------------------------------+" << endl;
+                cout << "|                    UPDATED REPORT DETAILS                        |" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
+                cout << "| Patient Name: " << left << setw(44) << patientName << "|" << endl;
+                cout << "| Record ID: " << left << setw(48) << recordId << "|" << endl;
+                cout << "| Report Type: " << left << setw(46) << (reportType.empty() ? "Not changed" : reportType) << "|" << endl;
+                cout << "| Report Date: " << left << setw(46) << (reportDate.empty() ? "Not changed" : reportDate) << "|" << endl;
+                cout << "+----------------------------------------------------------------+" << endl;
             } else {
                 cout << "\n❌ Failed to update report!" << endl;
             }
