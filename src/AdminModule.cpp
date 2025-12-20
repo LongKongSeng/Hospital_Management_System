@@ -1,6 +1,7 @@
 #include "AdminModule.h"
 #include "ColorUtils.h"
 #include "MenuNavigator.h"
+#include <cctype>
 
 AdminModule::AdminModule(Database* database) : db(database) {}
 
@@ -434,24 +435,6 @@ void AdminModule::addPatient() {
     displayTableHeader("ADD PATIENT");
 
     try {
-        // Check if patient already exists
-        int patientId = getIntInput("Enter Patient ID (or 0 for new patient): ");
-        
-        if (patientId > 0) {
-            // Check if patient exists
-            string checkQuery = "SELECT patient_id, full_name FROM patient WHERE patient_id = " + to_string(patientId);
-            sql::ResultSet* checkRes = db->executeSelect(checkQuery);
-            
-            if (checkRes && checkRes->next()) {
-                cout << "\n⚠️  Patient already exists!" << endl;
-                cout << "Patient Name: " << checkRes->getString("full_name") << endl;
-                if (checkRes) delete checkRes;
-                pressEnterToContinue();
-                return;
-            }
-            if (checkRes) delete checkRes;
-        }
-
         string fullName = getStringInput("Enter Patient Name: ");
         if (fullName.empty()) {
             cout << "\n❌ Patient name cannot be empty!" << endl;
@@ -466,31 +449,173 @@ void AdminModule::addPatient() {
             return;
         }
 
-        string dob = getStringInput("Enter Patient Date of Birth (YYYY-MM-DD): ");
-        if (dob.empty()) {
-            cout << "\n❌ Date of birth cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
+        // IC Number input and validation
+        string icNumber;
+        bool validIC = false;
+        while (!validIC) {
+            icNumber = getStringInput("Enter Patient IC Number: ");
+            if (icNumber.empty()) {
+                cout << "\n❌ IC number cannot be empty!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                continue;
+            }
+            
+            // Check if IC number already exists
+            string checkICQuery = "SELECT patient_id, full_name FROM patient WHERE ic_number = '" + icNumber + "'";
+            sql::ResultSet* checkICRes = db->executeSelect(checkICQuery);
+            
+            if (checkICRes && checkICRes->next()) {
+                cout << "\n⚠️  Patient already exists with this IC number!" << endl;
+                cout << "Patient ID: " << checkICRes->getInt("patient_id") << endl;
+                cout << "Patient Name: " << checkICRes->getString("full_name") << endl;
+                if (checkICRes) delete checkICRes;
+                pressEnterToContinue();
+                return;
+            }
+            if (checkICRes) delete checkICRes;
+            validIC = true;
         }
 
-        string contactNumber = getStringInput("Enter Patient Contact Number: ");
-        if (contactNumber.empty()) {
-            cout << "\n❌ Contact number cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
+        // Date of Birth with format validation
+        string dob;
+        bool validDOB = false;
+        while (!validDOB) {
+            dob = getStringInput("Enter Patient Date of Birth (YYYY-MM-DD): ");
+            if (dob.empty()) {
+                cout << "\n❌ Date of birth cannot be empty!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                continue;
+            }
+            
+            if (!validateDateFormat(dob)) {
+                cout << "\n❌ Invalid date format! Please use YYYY-MM-DD format (e.g., 1990-01-15)" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                continue;
+            }
+            validDOB = true;
         }
 
-        string bloodType = getStringInput("Enter Patient Blood Type: ");
-        string emergencyContact = getStringInput("Enter Emergency Contact: ");
+        // Contact Number with validation (10 or 11 digits)
+        string contactNumber;
+        bool validContact = false;
+        while (!validContact) {
+            contactNumber = getStringInput("Enter Patient Contact Number: ");
+            if (contactNumber.empty()) {
+                cout << "\n❌ Contact number cannot be empty!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
+                continue;
+            }
+            
+            if (!validatePhoneNumber(contactNumber)) {
+                cout << "\n❌ Contact number must be 10 or 11 digits!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
+                continue;
+            }
+            validContact = true;
+        }
 
-        string query = "INSERT INTO patient (full_name, gender, date_of_birth, contact_number, blood_type, emergency_contact, status) "
-            "VALUES ('" + fullName + "', '" + gender + "', '" + dob + "', '" + contactNumber + "', '" + bloodType + "', '" + emergencyContact + "', 'Active')";
+        // Blood Type with validation (only valid types)
+        string bloodType;
+        bool validBloodType = false;
+        while (!validBloodType) {
+            bloodType = getStringInput("Enter Patient Blood Type (A+, A-, B+, B-, AB+, AB-, O+, O-): ");
+            if (bloodType.empty()) {
+                cout << "\n❌ Blood type cannot be empty!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
+                cout << "Enter Patient Contact Number: " << contactNumber << endl;
+                continue;
+            }
+            
+            if (!validateBloodType(bloodType)) {
+                cout << "\n❌ Invalid blood type! Please enter one of: A+, A-, B+, B-, AB+, AB-, O+, O-" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
+                cout << "Enter Patient Contact Number: " << contactNumber << endl;
+                continue;
+            }
+            validBloodType = true;
+        }
+
+        // Emergency Contact with validation (10 or 11 digits)
+        string emergencyContact;
+        bool validEmergency = false;
+        while (!validEmergency) {
+            emergencyContact = getStringInput("Enter Emergency Contact: ");
+            if (emergencyContact.empty()) {
+                cout << "\n❌ Emergency contact cannot be empty!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
+                cout << "Enter Patient Contact Number: " << contactNumber << endl;
+                cout << "Enter Patient Blood Type (A+, A-, B+, B-, AB+, AB-, O+, O-): " << bloodType << endl;
+                continue;
+            }
+            
+            if (!validatePhoneNumber(emergencyContact)) {
+                cout << "\n❌ Emergency contact must be 10 or 11 digits!" << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
+                cout << "Enter Patient Contact Number: " << contactNumber << endl;
+                cout << "Enter Patient Blood Type (A+, A-, B+, B-, AB+, AB-, O+, O-): " << bloodType << endl;
+                continue;
+            }
+            validEmergency = true;
+        }
+
+        string query = "INSERT INTO patient (full_name, gender, date_of_birth, contact_number, blood_type, emergency_contact, ic_number, status) "
+            "VALUES ('" + fullName + "', '" + gender + "', '" + dob + "', '" + contactNumber + "', '" + bloodType + "', '" + emergencyContact + "', '" + icNumber + "', 'Active')";
 
         if (db->executeUpdate(query)) {
             cout << "\n✅ Patient added successfully!" << endl;
             
             // Display patient details
-            string getQuery = "SELECT patient_id, full_name, gender, date_of_birth, contact_number, status FROM patient WHERE full_name = '" + fullName + "' ORDER BY patient_id DESC LIMIT 1";
+            string getQuery = "SELECT patient_id, full_name, gender, date_of_birth, contact_number, status FROM patient WHERE ic_number = '" + icNumber + "' ORDER BY patient_id DESC LIMIT 1";
             sql::ResultSet* res = db->executeSelect(getQuery);
             if (res && res->next()) {
                 cout << "\n+----------------------------------------------------------------+" << endl;
@@ -724,4 +849,79 @@ string AdminModule::getStringInput(const string& prompt) {
     string input;
     getline(cin, input);
     return input;
+}
+
+bool AdminModule::validatePhoneNumber(const string& phoneNumber) {
+    if (phoneNumber.empty()) {
+        return false;
+    }
+    
+    // Check if all characters are digits
+    for (char c : phoneNumber) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    
+    // Check if length is 10 or 11 digits
+    if (phoneNumber.length() != 10 && phoneNumber.length() != 11) {
+        return false;
+    }
+    
+    return true;
+}
+
+bool AdminModule::validateDateFormat(const string& date) {
+    if (date.empty() || date.length() != 10) {
+        return false;
+    }
+    
+    // Check format: YYYY-MM-DD (10 characters)
+    // Format: YYYY-MM-DD where YYYY is 4 digits, MM is 2 digits, DD is 2 digits
+    if (date[4] != '-' || date[7] != '-') {
+        return false;
+    }
+    
+    // Check if all characters except dashes are digits
+    for (int i = 0; i < 10; i++) {
+        if (i != 4 && i != 7) {
+            if (!isdigit(date[i])) {
+                return false;
+            }
+        }
+    }
+    
+    // Basic validation for month (01-12) and day (01-31)
+    try {
+        string monthStr = date.substr(5, 2);
+        string dayStr = date.substr(8, 2);
+        
+        int month = stoi(monthStr);
+        int day = stoi(dayStr);
+        
+        if (month < 1 || month > 12) {
+            return false;
+        }
+        
+        if (day < 1 || day > 31) {
+            return false;
+        }
+    } catch (...) {
+        return false;
+    }
+    
+    return true;
+}
+
+bool AdminModule::validateBloodType(const string& bloodType) {
+    // Valid blood types: A+, A-, B+, B-, AB+, AB-, O+, O-
+    vector<string> validTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+    
+    for (const string& type : validTypes) {
+        if (bloodType == type) {
+            return true;
+        }
+    }
+    
+    return false;
 }

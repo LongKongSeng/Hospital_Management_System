@@ -43,6 +43,11 @@ public:
     int getIntInput(const string& prompt);
     string getStringInput(const string& prompt);
     void displayPharmacyTable(sql::ResultSet* res);
+    
+    // Validation Functions
+    bool validatePhoneNumber(const string& phoneNumber);
+    bool validateDateFormat(const string& date);
+    bool validateBloodType(const string& bloodType);
 };
 
 #endif

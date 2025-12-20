@@ -14,3 +14,5 @@ ADD COLUMN IF NOT EXISTS contact_number VARCHAR(20) NOT NULL DEFAULT '' AFTER em
 -- Verify the table structure
 DESCRIBE admin;
 
+
+

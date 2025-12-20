@@ -9,7 +9,7 @@ void DoctorModule::showMenu() {
     do {
         vector<string> menuOptions = {
             "View Patient Record",
-            "Generate Next Appointment",
+            "View Appointments",
             "Make Diagnosis",
             "Edit Patient Medical Record",
             "Return to Main Menu"
@@ -26,7 +26,7 @@ void DoctorModule::showMenu() {
             viewPatientRecord();
             break;
         case 1:
-            generateNextAppointment();
+            viewAppointments();
             break;
         case 2:
             makeDiagnosis();
@@ -109,89 +109,56 @@ void DoctorModule::viewPatientRecord() {
     pressEnterToContinue();
 }
 
-void DoctorModule::generateNextAppointment() {
+void DoctorModule::viewAppointments() {
     system("cls");
-    displayTableHeader("GENERATE NEXT APPOINTMENT");
-
-    int patientId = getIntInput("Enter Patient ID: ");
-    if (patientId <= 0) {
-        cout << "\n❌ Invalid Patient ID!" << endl;
-        pressEnterToContinue();
-        return;
-    }
-
-    // Verify patient exists
-    string checkQuery = "SELECT full_name, status FROM patient WHERE patient_id = " + to_string(patientId);
-    sql::ResultSet* checkRes = db->executeSelect(checkQuery);
-    
-    if (!checkRes || !checkRes->next()) {
-        cout << "\n❌ Patient not found!" << endl;
-        if (checkRes) delete checkRes;
-        pressEnterToContinue();
-        return;
-    }
-    
-    string patientName = checkRes->getString("full_name");
-    delete checkRes;
-
-    // Get available nurses
-    string nurseQuery = "SELECT nurse_id, full_name FROM nurse WHERE status = 'Active' ORDER BY nurse_id";
-    sql::ResultSet* nurseRes = db->executeSelect(nurseQuery);
-    
-    if (!nurseRes || nurseRes->rowsCount() == 0) {
-        cout << "\n❌ No active nurses available!" << endl;
-        if (nurseRes) delete nurseRes;
-        pressEnterToContinue();
-        return;
-    }
-
-    cout << "\nPatient: " << patientName << endl;
-    cout << "\nAvailable Nurses:\n" << endl;
-    cout << "+-----------+----------------------+" << endl;
-    cout << "| Nurse ID  | Full Name            |" << endl;
-    cout << "+-----------┼----------------------+" << endl;
-    while (nurseRes->next()) {
-        cout << "| " << setw(9) << nurseRes->getInt("nurse_id")
-             << "| " << setw(20) << nurseRes->getString("full_name") << "|" << endl;
-    }
-    cout << "+-----------+----------------------+" << endl;
-    delete nurseRes;
-
-    int nurseId = getIntInput("\nEnter Nurse ID: ");
-    if (nurseId <= 0) {
-        cout << "\n❌ Invalid Nurse ID!" << endl;
-        pressEnterToContinue();
-        return;
-    }
-
-    string appointmentDate = getStringInput("Enter Appointment Date (YYYY-MM-DD): ");
-    if (appointmentDate.empty()) {
-        cout << "\n❌ Appointment date cannot be empty!" << endl;
-        pressEnterToContinue();
-        return;
-    }
-
-    string appointmentTime = getStringInput("Enter Appointment Time (HH:MM:SS): ");
-    if (appointmentTime.empty()) {
-        appointmentTime = "09:00:00"; // Default time
-    }
+    displayTableHeader("VIEW APPOINTMENTS");
 
     try {
-        string query = "INSERT INTO appointment (patient_id, nurse_id, appointment_date, appointment_time, status) "
-            "VALUES (" + to_string(patientId) + ", " + to_string(nurseId) + ", '" + appointmentDate + "', '" + appointmentTime + "', 'Scheduled')";
+        // Get appointments assigned to this doctor
+        string appointmentQuery = "SELECT a.appointment_id, a.appointment_date, a.appointment_time, a.status, "
+                                 "p.patient_id, p.full_name as patient_name, n.full_name as nurse_name "
+                                 "FROM appointment a "
+                                 "JOIN patient p ON a.patient_id = p.patient_id "
+                                 "JOIN nurse n ON a.nurse_id = n.nurse_id "
+                                 "WHERE a.doctor_id = " + to_string(currentDoctorId) + " "
+                                 "ORDER BY a.appointment_date DESC, a.appointment_time DESC";
 
-        if (db->executeUpdate(query)) {
-            cout << "\n✅ Next appointment generated successfully!" << endl;
-            cout << "Patient: " << patientName << endl;
-            cout << "Appointment Date: " << appointmentDate << endl;
-            cout << "Appointment Time: " << appointmentTime << endl;
+        sql::ResultSet* appointmentRes = db->executeSelect(appointmentQuery);
+        
+        if (appointmentRes && appointmentRes->rowsCount() > 0) {
+            cout << "\n+-----------------+-----------+----------------------+--------------+--------------+----------------------+" << endl;
+            cout << "| Appointment ID  | Patient ID| Patient Name          | Date         | Time         | Status               |" << endl;
+            cout << "+-----------------┼-----------┼----------------------┼--------------┼--------------┼----------------------+" << endl;
             
-            // Update patient status to Active if appointment is scheduled
-            string updateQuery = "UPDATE patient SET status = 'Active' WHERE patient_id = " + to_string(patientId);
-            db->executeUpdate(updateQuery);
+            while (appointmentRes->next()) {
+                cout << "| " << setw(15) << appointmentRes->getInt("appointment_id")
+                     << "| " << setw(9) << appointmentRes->getInt("patient_id")
+                     << "| " << setw(20) << appointmentRes->getString("patient_name")
+                     << "| " << setw(12) << appointmentRes->getString("appointment_date")
+                     << "| " << setw(12) << appointmentRes->getString("appointment_time")
+                     << "| " << setw(20) << appointmentRes->getString("status") << "|" << endl;
+            }
+            
+            cout << "+-----------------+-----------+----------------------+--------------+--------------+----------------------+" << endl;
+            
+            // Show appointment count
+            string countQuery = "SELECT COUNT(*) as total_count, "
+                               "SUM(CASE WHEN status = 'Scheduled' THEN 1 ELSE 0 END) as scheduled_count, "
+                               "SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed_count "
+                               "FROM appointment WHERE doctor_id = " + to_string(currentDoctorId);
+            
+            sql::ResultSet* countRes = db->executeSelect(countQuery);
+            if (countRes && countRes->next()) {
+                cout << "\nSummary:" << endl;
+                cout << "Total Appointments: " << countRes->getInt("total_count") << endl;
+                cout << "Scheduled: " << countRes->getInt("scheduled_count") << endl;
+                cout << "Completed: " << countRes->getInt("completed_count") << endl;
+            }
+            if (countRes) delete countRes;
         } else {
-            cout << "\n❌ Failed to generate appointment!" << endl;
+            cout << "\n⚠️  No appointments found for this doctor." << endl;
         }
+        if (appointmentRes) delete appointmentRes;
     }
     catch (exception& e) {
         cout << "\n❌ Error: " << e.what() << endl;

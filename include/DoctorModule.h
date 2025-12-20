@@ -20,7 +20,7 @@ public:
     
     // Doctor Module Functions (from flowchart)
     void viewPatientRecord();
-    void generateNextAppointment();
+    void viewAppointments();
     void makeDiagnosis();
     void editPatientMedicalRecord();
     
@@ -34,6 +34,8 @@ public:
 };
 
 #endif
+
+
 
 
 

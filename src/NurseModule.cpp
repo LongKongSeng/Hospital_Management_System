@@ -162,6 +162,48 @@ void NurseModule::generateNextAppointment() {
     string patientStatus = checkRes->getString("status");
     delete checkRes;
 
+    // Get available doctors
+    string doctorQuery = "SELECT doctor_id, full_name, specialization FROM doctor WHERE status = 'Active' ORDER BY doctor_id";
+    sql::ResultSet* doctorRes = db->executeSelect(doctorQuery);
+    
+    if (!doctorRes || doctorRes->rowsCount() == 0) {
+        cout << "\n❌ No active doctors available!" << endl;
+        if (doctorRes) delete doctorRes;
+        pressEnterToContinue();
+        return;
+    }
+
+    cout << "\nPatient: " << patientName << endl;
+    cout << "\nAvailable Doctors:\n" << endl;
+    cout << "+-----------+----------------------+----------------------+" << endl;
+    cout << "| Doctor ID | Full Name            | Specialization       |" << endl;
+    cout << "+-----------┼----------------------┼----------------------+" << endl;
+    while (doctorRes->next()) {
+        cout << "| " << setw(9) << doctorRes->getInt("doctor_id")
+             << "| " << setw(20) << doctorRes->getString("full_name")
+             << "| " << setw(20) << doctorRes->getString("specialization") << "|" << endl;
+    }
+    cout << "+-----------+----------------------+----------------------+" << endl;
+    delete doctorRes;
+
+    int doctorId = getIntInput("\nEnter Doctor ID: ");
+    if (doctorId <= 0) {
+        cout << "\n❌ Invalid Doctor ID!" << endl;
+        pressEnterToContinue();
+        return;
+    }
+
+    // Verify doctor exists
+    string verifyDoctorQuery = "SELECT doctor_id FROM doctor WHERE doctor_id = " + to_string(doctorId) + " AND status = 'Active'";
+    sql::ResultSet* verifyDoctorRes = db->executeSelect(verifyDoctorQuery);
+    if (!verifyDoctorRes || !verifyDoctorRes->next()) {
+        cout << "\n❌ Doctor not found or not active!" << endl;
+        if (verifyDoctorRes) delete verifyDoctorRes;
+        pressEnterToContinue();
+        return;
+    }
+    delete verifyDoctorRes;
+
     string appointmentDate = getStringInput("Enter Appointment Date (YYYY-MM-DD): ");
     if (appointmentDate.empty()) {
         cout << "\n❌ Appointment date cannot be empty!" << endl;
@@ -175,8 +217,8 @@ void NurseModule::generateNextAppointment() {
     }
 
     try {
-        string query = "INSERT INTO appointment (patient_id, nurse_id, appointment_date, appointment_time, status) "
-            "VALUES (" + to_string(patientId) + ", " + to_string(currentNurseId) + ", '" + appointmentDate + "', '" + appointmentTime + "', 'Scheduled')";
+        string query = "INSERT INTO appointment (patient_id, nurse_id, doctor_id, appointment_date, appointment_time, status) "
+            "VALUES (" + to_string(patientId) + ", " + to_string(currentNurseId) + ", " + to_string(doctorId) + ", '" + appointmentDate + "', '" + appointmentTime + "', 'Scheduled')";
 
         if (db->executeUpdate(query)) {
             cout << "\n✅ Next appointment generated successfully!" << endl;

@@ -194,3 +194,5 @@ SELECT 'admin', 'admin123', 'Admin', admin_id
 FROM admin WHERE email = 'admin@hospital.com'
 ON DUPLICATE KEY UPDATE username=username;
 
+
+
