@@ -442,25 +442,56 @@ void AdminModule::addPatient() {
             return;
         }
 
-        string gender = getStringInput("Enter Patient Gender (Male/Female/Other): ");
-        if (gender.empty()) {
-            cout << "\n❌ Gender cannot be empty!" << endl;
-            pressEnterToContinue();
-            return;
-        }
-
-        // IC Number input and validation
-        string icNumber;
-        bool validIC = false;
-        while (!validIC) {
-            icNumber = getStringInput("Enter Patient IC Number: ");
-            if (icNumber.empty()) {
-                cout << "\n❌ IC number cannot be empty!" << endl;
+        // Gender input with validation (Male/Female only)
+        string gender;
+        bool validGender = false;
+        while (!validGender) {
+            gender = getStringInput("Enter Patient Gender (Male/Female or M/F): ");
+            if (gender.empty()) {
+                cout << "\n❌ Gender cannot be empty! Please try again." << endl;
                 pressEnterToContinue();
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
+                continue;
+            }
+            
+            // Validate and correct gender
+            string correctedGender = validateAndCorrectGender(gender);
+            if (correctedGender != "Male" && correctedGender != "Female") {
+                cout << "\n❌ Gender must be Male or Female only! Please try again." << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                continue;
+            }
+            gender = correctedGender;
+            validGender = true;
+        }
+
+        // IC Number input and validation (12 digits)
+        string icNumber;
+        bool validIC = false;
+        while (!validIC) {
+            icNumber = getStringInput("Enter Patient IC Number (12 digits): ");
+            if (icNumber.empty()) {
+                cout << "\n❌ IC number cannot be empty! Please try again." << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                continue;
+            }
+            
+            if (!validateICNumber(icNumber)) {
+                cout << "\n❌ IC number must be exactly 12 digits! Please try again." << endl;
+                pressEnterToContinue();
+                system("cls");
+                displayTableHeader("ADD PATIENT");
+                cout << "Enter Patient Name: " << fullName << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
                 continue;
             }
             
@@ -491,8 +522,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 continue;
             }
             
@@ -502,8 +533,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 continue;
             }
             validDOB = true;
@@ -520,8 +551,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
                 continue;
             }
@@ -532,8 +563,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
                 continue;
             }
@@ -551,8 +582,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
                 cout << "Enter Patient Contact Number: " << contactNumber << endl;
                 continue;
@@ -564,8 +595,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
                 cout << "Enter Patient Contact Number: " << contactNumber << endl;
                 continue;
@@ -584,8 +615,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
                 cout << "Enter Patient Contact Number: " << contactNumber << endl;
                 cout << "Enter Patient Blood Type (A+, A-, B+, B-, AB+, AB-, O+, O-): " << bloodType << endl;
@@ -598,8 +629,8 @@ void AdminModule::addPatient() {
                 system("cls");
                 displayTableHeader("ADD PATIENT");
                 cout << "Enter Patient Name: " << fullName << endl;
-                cout << "Enter Patient Gender (Male/Female/Other): " << gender << endl;
-                cout << "Enter Patient IC Number: " << icNumber << endl;
+                cout << "Enter Patient Gender (Male/Female or M/F): " << gender << endl;
+                cout << "Enter Patient IC Number (12 digits): " << icNumber << endl;
                 cout << "Enter Patient Date of Birth (YYYY-MM-DD): " << dob << endl;
                 cout << "Enter Patient Contact Number: " << contactNumber << endl;
                 cout << "Enter Patient Blood Type (A+, A-, B+, B-, AB+, AB-, O+, O-): " << bloodType << endl;
@@ -924,4 +955,39 @@ bool AdminModule::validateBloodType(const string& bloodType) {
     }
     
     return false;
+}
+
+bool AdminModule::validateICNumber(const string& icNumber) {
+    if (icNumber.empty()) {
+        return false;
+    }
+    // Check if all characters are digits
+    for (char c : icNumber) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    // Check if length is exactly 12 digits
+    if (icNumber.length() != 12) {
+        return false;
+    }
+    return true;
+}
+
+string AdminModule::validateAndCorrectGender(string& gender) {
+    // Convert to lowercase for comparison
+    string genderLower = gender;
+    for (char& c : genderLower) {
+        c = tolower(c);
+    }
+    
+    // Auto-correct common inputs
+    if (genderLower == "m" || genderLower == "male") {
+        return "Male";
+    } else if (genderLower == "f" || genderLower == "female") {
+        return "Female";
+    } else {
+        // Return original if not valid
+        return gender;
+    }
 }

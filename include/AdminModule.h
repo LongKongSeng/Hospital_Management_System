@@ -48,6 +48,8 @@ public:
     bool validatePhoneNumber(const string& phoneNumber);
     bool validateDateFormat(const string& date);
     bool validateBloodType(const string& bloodType);
+    bool validateICNumber(const string& icNumber);
+    string validateAndCorrectGender(string& gender);
 };
 
 #endif
