@@ -18,35 +18,92 @@ USE hospital_management_system;
 -- Treatment IDs: 20000-29999 (format: 2xxxx)
 -- Finance IDs: 30000-39999 (format: 3xxxx)
 
--- Get current max IDs and set appropriate starting values
-SET @max_doctor = IFNULL((SELECT MAX(doctor_id) FROM doctor), 0);
-SET @max_nurse = IFNULL((SELECT MAX(nurse_id) FROM nurse), 0);
-SET @max_admin = IFNULL((SELECT MAX(admin_id) FROM admin), 0);
-SET @max_patient = IFNULL((SELECT MAX(patient_id) FROM patient), 0);
-SET @max_login = IFNULL((SELECT MAX(login_id) FROM login), 0);
-SET @max_pharmacy = IFNULL((SELECT MAX(pharmacy_id) FROM pharmacy), 0);
-SET @max_prescription = IFNULL((SELECT MAX(prescription_id) FROM prescription), 0);
-SET @max_diagnosis = IFNULL((SELECT MAX(diagnosis_id) FROM diagnosis), 0);
-SET @max_record = IFNULL((SELECT MAX(record_id) FROM medical_record), 0);
-SET @max_appointment = IFNULL((SELECT MAX(appointment_id) FROM appointment), 0);
-SET @max_treatment = IFNULL((SELECT MAX(treatment_id) FROM treatment), 0);
-SET @max_finance = IFNULL((SELECT MAX(finance_id) FROM finance), 0);
-
--- Set AUTO_INCREMENT starting values
+-- Get current max IDs and calculate appropriate starting values
 -- If existing IDs are less than the range start, use range start
 -- Otherwise, continue from current max + 1
-ALTER TABLE doctor AUTO_INCREMENT = GREATEST(1000, @max_doctor + 1);
-ALTER TABLE nurse AUTO_INCREMENT = GREATEST(2000, @max_nurse + 1);
-ALTER TABLE admin AUTO_INCREMENT = GREATEST(3000, @max_admin + 1);
-ALTER TABLE patient AUTO_INCREMENT = GREATEST(4000, @max_patient + 1);
-ALTER TABLE login AUTO_INCREMENT = GREATEST(5000, @max_login + 1);
-ALTER TABLE pharmacy AUTO_INCREMENT = GREATEST(6000, @max_pharmacy + 1);
-ALTER TABLE prescription AUTO_INCREMENT = GREATEST(7000, @max_prescription + 1);
-ALTER TABLE diagnosis AUTO_INCREMENT = GREATEST(8000, @max_diagnosis + 1);
-ALTER TABLE medical_record AUTO_INCREMENT = GREATEST(9000, @max_record + 1);
-ALTER TABLE appointment AUTO_INCREMENT = GREATEST(10000, @max_appointment + 1);
-ALTER TABLE treatment AUTO_INCREMENT = GREATEST(20000, @max_treatment + 1);
-ALTER TABLE finance AUTO_INCREMENT = GREATEST(30000, @max_finance + 1);
+SET @max_doctor = IFNULL((SELECT MAX(doctor_id) FROM doctor), 0);
+SET @start_doctor = IF(@max_doctor < 1000, 1000, @max_doctor + 1);
+SET @sql = CONCAT('ALTER TABLE doctor AUTO_INCREMENT = ', @start_doctor);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_nurse = IFNULL((SELECT MAX(nurse_id) FROM nurse), 0);
+SET @start_nurse = IF(@max_nurse < 2000, 2000, @max_nurse + 1);
+SET @sql = CONCAT('ALTER TABLE nurse AUTO_INCREMENT = ', @start_nurse);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_admin = IFNULL((SELECT MAX(admin_id) FROM admin), 0);
+SET @start_admin = IF(@max_admin < 3000, 3000, @max_admin + 1);
+SET @sql = CONCAT('ALTER TABLE admin AUTO_INCREMENT = ', @start_admin);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_patient = IFNULL((SELECT MAX(patient_id) FROM patient), 0);
+SET @start_patient = IF(@max_patient < 4000, 4000, @max_patient + 1);
+SET @sql = CONCAT('ALTER TABLE patient AUTO_INCREMENT = ', @start_patient);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_login = IFNULL((SELECT MAX(login_id) FROM login), 0);
+SET @start_login = IF(@max_login < 5000, 5000, @max_login + 1);
+SET @sql = CONCAT('ALTER TABLE login AUTO_INCREMENT = ', @start_login);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_pharmacy = IFNULL((SELECT MAX(pharmacy_id) FROM pharmacy), 0);
+SET @start_pharmacy = IF(@max_pharmacy < 6000, 6000, @max_pharmacy + 1);
+SET @sql = CONCAT('ALTER TABLE pharmacy AUTO_INCREMENT = ', @start_pharmacy);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_prescription = IFNULL((SELECT MAX(prescription_id) FROM prescription), 0);
+SET @start_prescription = IF(@max_prescription < 7000, 7000, @max_prescription + 1);
+SET @sql = CONCAT('ALTER TABLE prescription AUTO_INCREMENT = ', @start_prescription);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_diagnosis = IFNULL((SELECT MAX(diagnosis_id) FROM diagnosis), 0);
+SET @start_diagnosis = IF(@max_diagnosis < 8000, 8000, @max_diagnosis + 1);
+SET @sql = CONCAT('ALTER TABLE diagnosis AUTO_INCREMENT = ', @start_diagnosis);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_record = IFNULL((SELECT MAX(record_id) FROM medical_record), 0);
+SET @start_record = IF(@max_record < 9000, 9000, @max_record + 1);
+SET @sql = CONCAT('ALTER TABLE medical_record AUTO_INCREMENT = ', @start_record);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_appointment = IFNULL((SELECT MAX(appointment_id) FROM appointment), 0);
+SET @start_appointment = IF(@max_appointment < 10000, 10000, @max_appointment + 1);
+SET @sql = CONCAT('ALTER TABLE appointment AUTO_INCREMENT = ', @start_appointment);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_treatment = IFNULL((SELECT MAX(treatment_id) FROM treatment), 0);
+SET @start_treatment = IF(@max_treatment < 20000, 20000, @max_treatment + 1);
+SET @sql = CONCAT('ALTER TABLE treatment AUTO_INCREMENT = ', @start_treatment);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @max_finance = IFNULL((SELECT MAX(finance_id) FROM finance), 0);
+SET @start_finance = IF(@max_finance < 30000, 30000, @max_finance + 1);
+SET @sql = CONCAT('ALTER TABLE finance AUTO_INCREMENT = ', @start_finance);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Verify the changes
 SELECT 'Doctor AUTO_INCREMENT' AS Table_Name, AUTO_INCREMENT 
